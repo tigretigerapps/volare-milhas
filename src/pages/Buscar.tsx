@@ -5,9 +5,11 @@ import { FaixaAlerta } from '@/components/FaixaAlerta'
 import { LinhaResultado } from '@/components/LinhaResultado'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { useAuth } from '@/contexts/useAuth'
 import { alertaExemplo, milheiroExemplo, ofertasExemplo } from '@/data/exemplo'
 import { ordenarOfertas, type CriterioOrdenacao } from '@/lib/comparacao'
 import { formatarReaisComCentavos } from '@/lib/formato'
+import { interpretarMilheiro, milheiroParaCampo } from '@/lib/milheiro'
 import { cn } from '@/lib/utils'
 
 const criterios: { valor: CriterioOrdenacao; rotulo: string }[] = [
@@ -16,25 +18,44 @@ const criterios: { valor: CriterioOrdenacao; rotulo: string }[] = [
   { valor: 'duracao', rotulo: 'duração' },
 ]
 
-function MilheiroUsuario({ valor, onAlterar }: { valor: number; onAlterar: (valor: number) => void }) {
+function MilheiroUsuario({
+  valor,
+  onAlterar,
+}: {
+  valor: number
+  onAlterar: (valor: number) => Promise<string | null>
+}) {
   const [editando, setEditando] = useState(false)
   const [rascunho, setRascunho] = useState('')
+  const [erro, setErro] = useState<string | null>(null)
+  const [salvando, setSalvando] = useState(false)
 
   const abrir = () => {
-    setRascunho(valor.toFixed(2).replace('.', ','))
+    setRascunho(milheiroParaCampo(valor))
+    setErro(null)
     setEditando(true)
   }
 
-  const salvar = (evento: FormEvent) => {
+  const salvar = async (evento: FormEvent) => {
     evento.preventDefault()
-    const numero = Number(rascunho.replace(/\./g, '').replace(',', '.'))
-    if (Number.isFinite(numero) && numero > 0) onAlterar(numero)
+    const numero = interpretarMilheiro(rascunho)
+    if (numero === null) {
+      setErro('Use um valor como 20,00.')
+      return
+    }
+    setSalvando(true)
+    const falha = await onAlterar(numero)
+    setSalvando(false)
+    if (falha) {
+      setErro(falha)
+      return
+    }
     setEditando(false)
   }
 
   if (editando) {
     return (
-      <form onSubmit={salvar} className="flex flex-wrap items-center gap-2">
+      <form onSubmit={salvar} noValidate className="flex flex-wrap items-center gap-2">
         <label htmlFor="milheiro" className="text-texto-secundario">
           Seu milheiro: R$
         </label>
@@ -44,14 +65,20 @@ function MilheiroUsuario({ valor, onAlterar }: { valor: number; onAlterar: (valo
           value={rascunho}
           onChange={(e) => setRascunho(e.target.value)}
           className="h-9 w-24 tabular-nums"
+          aria-invalid={erro ? true : undefined}
           autoFocus
         />
-        <Button type="submit" size="sm">
-          Salvar
+        <Button type="submit" size="sm" disabled={salvando}>
+          {salvando ? 'Salvando…' : 'Salvar'}
         </Button>
         <Button type="button" variant="link" onClick={() => setEditando(false)}>
           Cancelar
         </Button>
+        {erro && (
+          <p role="alert" className="basis-full text-texto">
+            {erro}
+          </p>
+        )}
       </form>
     )
   }
@@ -70,7 +97,19 @@ function MilheiroUsuario({ valor, onAlterar }: { valor: number; onAlterar: (valo
 }
 
 export function Buscar() {
-  const [milheiro, setMilheiro] = useState(milheiroExemplo)
+  const { user, perfil, atualizarPerfil } = useAuth()
+  // Sem conta, o milheiro vale só nesta tela; com conta, vem do perfil e é salvo nele.
+  const [milheiroLocal, setMilheiroLocal] = useState(milheiroExemplo)
+  const milheiro = (user && perfil?.custo_milheiro) || milheiroLocal
+
+  const alterarMilheiro = async (valor: number) => {
+    if (!user) {
+      setMilheiroLocal(valor)
+      return null
+    }
+    const { erro } = await atualizarPerfil({ custo_milheiro: valor })
+    return erro
+  }
   const [criterio, setCriterio] = useState<CriterioOrdenacao>('economia')
 
   const ofertas = ordenarOfertas(ofertasExemplo, criterio, milheiro)
@@ -86,7 +125,7 @@ export function Buscar() {
       />
 
       <div className="flex flex-col gap-2 text-sm md:flex-row md:items-baseline md:justify-between">
-        <MilheiroUsuario valor={milheiro} onAlterar={setMilheiro} />
+        <MilheiroUsuario valor={milheiro} onAlterar={alterarMilheiro} />
 
         <p className="text-texto-secundario">
           Ordenar por{' '}

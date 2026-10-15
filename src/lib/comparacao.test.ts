@@ -63,6 +63,12 @@ describe('compararOferta', () => {
     expect(r.diferencaArredondada).toBe(65)
   })
 
+  it('arredonda meio real para cima mesmo com imprecisão de ponto flutuante', () => {
+    // 14.800 mi a R$ 25,50 + R$ 38,25 = R$ 415,65; 528,15 − 415,65 = 112,50.
+    const r = compararOferta(oferta('smiles-clube-g31650'), 25.5)
+    expect(r.diferencaArredondada).toBe(113)
+  })
+
   it('diferença que arredonda para zero é empate', () => {
     const quaseIgual: Oferta = { ...oferta('smiles-g31650'), dinheiro: 408.5 }
     const r = compararOferta(quaseIgual, 20)

@@ -25,7 +25,8 @@ export function custoMilhasEmReais(milhas: number, taxas: number, milheiro: numb
 export function compararOferta(oferta: Oferta, milheiro: number): Comparacao {
   const custoMilhas = custoMilhasEmReais(oferta.milhas, oferta.taxas, milheiro)
   const economia = oferta.dinheiro - custoMilhas
-  const diferencaArredondada = Math.round(Math.abs(economia))
+  // Arredonda primeiro para centavos: sem isso, 112,50 pode virar 112,4999… e cair para 112.
+  const diferencaArredondada = Math.round(Number(Math.abs(economia).toFixed(2)))
 
   // O veredito compara o que o usuário lê: se a diferença some no arredondamento, é empate.
   const vencedor: Vencedor =
