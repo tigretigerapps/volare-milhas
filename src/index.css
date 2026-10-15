@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Design system do volare.
+ * Tokens semânticos em canais RGB (consumidos pelo tailwind.config.ts como rgb(var(--x) / alpha)).
+ * Nenhum componente usa cor solta: sempre um destes tokens.
+ */
+@layer base {
+  :root {
+    --fundo: 243 245 247; /* #F3F5F7 */
+    --superficie: 255 255 255; /* #FFFFFF */
+    --texto: 29 57 86; /* #1D3956 */
+    --texto-secundario: 91 107 127; /* #5B6B7F */
+    --economia: 79 190 168; /* #4FBEA8, barra das milhas */
+    --economia-texto: 31 127 110; /* #1F7F6E */
+    --dinheiro: 138 151 168; /* #8A97A8, barra do dinheiro */
+    --fio: 213 213 211; /* #D5D5D3 */
+    --alerta: 234 110 52; /* #EA6E34, só badge de alerta e ponto de preço-alvo */
+
+    --primario: 29 57 86; /* navy: botão primário e barra superior */
+    --primario-texto: 255 255 255;
+
+    --raio: 6px;
+  }
+
+  /*
+   * Modo escuro: ainda não ativado na interface.
+   * Os tokens já existem para que basta adicionar a classe "dark" no <html> no futuro.
+   */
+  .dark {
+    --fundo: 16 26 38;
+    --superficie: 23 36 51;
+    --texto: 228 234 241;
+    --texto-secundario: 150 164 181;
+    --economia: 79 190 168;
+    --economia-texto: 110 211 189;
+    --dinheiro: 120 134 152;
+    --fio: 52 66 83;
+    --alerta: 240 128 76;
+
+    --primario: 228 234 241;
+    --primario-texto: 16 26 38;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-fundo font-sans font-light text-texto antialiased;
+  }
+}
