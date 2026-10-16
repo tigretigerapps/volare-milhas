@@ -5,7 +5,7 @@ import type { Database } from './types'
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-if (!supabaseUrl || !supabaseAnonKey) {
+if (!supabaseUrl?.trim() || !supabaseAnonKey?.trim()) {
   throw new Error(
     'Supabase não configurado: defina VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no .env.local',
   )

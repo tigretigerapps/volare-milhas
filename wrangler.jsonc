@@ -1,0 +1,11 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // O nome precisa ser igual ao do Worker criado no painel da Cloudflare.
+  "name": "volare-milhas",
+  "compatibility_date": "2026-10-16",
+  "assets": {
+    "directory": "./dist",
+    // App de página única: qualquer endereço (como /rotas) entrega o index.html.
+    "not_found_handling": "single-page-application"
+  }
+}
