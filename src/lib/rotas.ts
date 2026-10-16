@@ -136,9 +136,13 @@ export function descreverCompanhias(companhias: readonly string[]): string {
   return new Intl.ListFormat('pt-BR', { type: 'conjunction' }).format(nomes)
 }
 
-/** Data local de hoje no formato "AAAA-MM-DD". */
-export function hojeISO(agora = new Date()): string {
-  const mes = String(agora.getMonth() + 1).padStart(2, '0')
-  const dia = String(agora.getDate()).padStart(2, '0')
-  return `${agora.getFullYear()}-${mes}-${dia}`
+/**
+ * Mensagem para o erro do banco ao salvar uma rota. O gatilho de limite do plano devolve "limite_rotas";
+ * qualquer outro erro vira a mensagem padrão da ação.
+ */
+export function mensagemErroRota(erro: { message?: string } | null, padrao: string): string {
+  if (erro?.message?.includes('limite_rotas')) {
+    return 'Você atingiu o limite de rotas ativas do seu plano. Pause ou exclua uma rota para liberar vaga.'
+  }
+  return padrao
 }

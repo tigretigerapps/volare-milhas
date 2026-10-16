@@ -4,6 +4,7 @@ import { FormularioRota } from '@/components/FormularioRota'
 import { LinhaRota } from '@/components/LinhaRota'
 import { Button } from '@/components/ui/button'
 import { useAlertas } from '@/contexts/useAlertas'
+import { usePlano } from '@/hooks/usePlano'
 import { useRotas } from '@/hooks/useRotas'
 import { formularioVazio, rotaParaFormulario, type DadosRota } from '@/lib/rotas'
 
@@ -13,6 +14,7 @@ type Edicao = null | 'nova' | string
 export function Rotas() {
   const { rotas, carregando, erroCarga, criar, atualizar, excluir } = useRotas()
   const { marcarVistos } = useAlertas()
+  const { plano, limiteRotas } = usePlano()
   const [edicao, setEdicao] = useState<Edicao>(null)
 
   const formulario = useRef<HTMLDivElement>(null)
@@ -26,6 +28,9 @@ export function Rotas() {
   useEffect(() => {
     if (edicao !== null) formulario.current?.scrollIntoView?.({ behavior: 'smooth', block: 'start' })
   }, [edicao])
+
+  const ativas = rotas.filter((r) => r.ativo).length
+  const semVaga = typeof limiteRotas === 'number' && ativas >= limiteRotas
 
   const rotaEditada = edicao && edicao !== 'nova' ? rotas.find((r) => r.id === edicao) : undefined
 
@@ -43,8 +48,19 @@ export function Rotas() {
           <p className="mt-1 text-sm text-texto-secundario">
             Acompanhamos estas rotas e avisamos quando o preço chegar à sua meta.
           </p>
+          {typeof limiteRotas === 'number' && (
+            <p className="mt-1 text-sm tabular-nums text-texto-secundario" data-testid="uso-rotas">
+              {limiteRotas === 0
+                ? 'Sua assinatura não está ativa: não é possível criar rotas novas.'
+                : `${ativas} de ${limiteRotas} rotas com alerta ativas${plano ? ` no plano ${plano.nome}` : ''}.`}
+            </p>
+          )}
         </div>
-        {edicao === null && rotas.length > 0 && <Button onClick={() => setEdicao('nova')}>Nova rota</Button>}
+        {edicao === null && rotas.length > 0 && (
+          <Button onClick={() => setEdicao('nova')} disabled={semVaga}>
+            Nova rota
+          </Button>
+        )}
       </div>
 
       {edicao !== null && (
@@ -74,7 +90,9 @@ export function Rotas() {
               Escolha origem, destino, período e um preço-alvo. Quando aparecer uma oferta que bata a meta, você fica
               sabendo.
             </p>
-            <Button onClick={() => setEdicao('nova')}>Nova rota</Button>
+            <Button onClick={() => setEdicao('nova')} disabled={semVaga}>
+              Nova rota
+            </Button>
           </div>
         )
       ) : (

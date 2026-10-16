@@ -40,9 +40,14 @@ export function formatarDuracao(minutos: number): string {
   return m === 0 ? `${h}h` : `${h}h${String(m).padStart(2, '0')}`
 }
 
-/** [] → "direto", ["BSB"] → "1 parada em BSB", ["BSB", "REC"] → "2 paradas em BSB e REC". */
+/**
+ * [] → "direto", ["BSB"] → "1 parada em BSB", ["BSB", "REC"] → "2 paradas em BSB e REC".
+ * Código vazio ("") conta a parada mas não a nomeia: "1 parada".
+ */
 export function formatarParadas(paradas: readonly string[]): string {
   if (paradas.length === 0) return 'direto'
-  const lista = new Intl.ListFormat('pt-BR', { type: 'conjunction' }).format(paradas)
-  return `${paradas.length} ${paradas.length === 1 ? 'parada' : 'paradas'} em ${lista}`
+  const rotulo = `${paradas.length} ${paradas.length === 1 ? 'parada' : 'paradas'}`
+  const codigos = paradas.filter(Boolean)
+  if (codigos.length === 0) return rotulo
+  return `${rotulo} em ${new Intl.ListFormat('pt-BR', { type: 'conjunction' }).format(codigos)}`
 }

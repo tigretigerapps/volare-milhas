@@ -292,6 +292,27 @@ export type Database = {
           },
         ]
       }
+      planos: {
+        Row: {
+          destinos_por_dia: number
+          nome: string
+          plano: string
+          rotas_com_alerta: number
+        }
+        Insert: {
+          destinos_por_dia: number
+          nome: string
+          plano: string
+          rotas_com_alerta: number
+        }
+        Update: {
+          destinos_por_dia?: number
+          nome?: string
+          plano?: string
+          rotas_com_alerta?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string

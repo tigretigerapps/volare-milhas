@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 
 import { useAuth } from '@/contexts/useAuth'
 import { supabase } from '@/integrations/supabase/client'
-import type { DadosRota, Rota } from '@/lib/rotas'
+import { mensagemErroRota, type DadosRota, type Rota } from '@/lib/rotas'
 
 type Resultado = { erro: string | null }
 
@@ -43,7 +43,7 @@ export function useRotas() {
     const { data, error } = await supabase.from('rotas_salvas').insert(dados).select().single()
     if (error) {
       console.error('Erro ao criar rota', error)
-      return { erro: erroGenerico }
+      return { erro: mensagemErroRota(error, erroGenerico) }
     }
     setRotas((atuais) => [data, ...atuais])
     return { erro: null }
@@ -54,7 +54,7 @@ export function useRotas() {
       const { data, error } = await supabase.from('rotas_salvas').update(alteracao).eq('id', id).select().single()
       if (error) {
         console.error('Erro ao atualizar rota', error)
-        return { erro: erroGenerico }
+        return { erro: mensagemErroRota(error, erroGenerico) }
       }
       setRotas((atuais) => atuais.map((r) => (r.id === id ? data : r)))
       return { erro: null }

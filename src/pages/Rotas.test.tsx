@@ -18,6 +18,16 @@ vi.mock('@/hooks/useRotas', () => ({
   useRotas: () => ({ ...estado, ...acoes }),
 }))
 
+let limiteRotas: number | null | undefined = 5
+vi.mock('@/hooks/usePlano', () => ({
+  usePlano: () => ({
+    plano: { plano: 'plus', nome: 'Plus', destinos_por_dia: 10, rotas_com_alerta: 5 },
+    assinaturaAtiva: true,
+    limiteRotas,
+    limiteDestinos: 10,
+  }),
+}))
+
 const marcarVistos = vi.fn()
 vi.mock('@/contexts/useAlertas', () => ({
   useAlertas: () => ({ alertas: [], naoVistos: 0, recente: null, marcarVistos }),
@@ -39,6 +49,7 @@ const rotaLisboa: Rota = {
 }
 
 beforeEach(() => {
+  limiteRotas = 5
   estado = { rotas: [], carregando: false, erroCarga: null }
   acoes.criar.mockResolvedValue({ erro: null })
   acoes.atualizar.mockResolvedValue({ erro: null })
@@ -51,6 +62,40 @@ afterEach(() => {
 })
 
 describe('Minhas rotas', () => {
+  it('mostra quantas rotas do plano estão em uso', () => {
+    estado.rotas = [rotaLisboa]
+    render(<Rotas />)
+    expect(screen.getByTestId('uso-rotas')).toHaveTextContent('1 de 5 rotas com alerta ativas no plano Plus.')
+    expect(screen.getByRole('button', { name: 'Nova rota' })).toBeEnabled()
+  })
+
+  it('no limite do plano, desliga Nova rota; pausadas não contam', () => {
+    limiteRotas = 1
+    estado.rotas = [rotaLisboa]
+    const { unmount } = render(<Rotas />)
+    expect(screen.getByRole('button', { name: 'Nova rota' })).toBeDisabled()
+    unmount()
+
+    estado.rotas = [{ ...rotaLisboa, ativo: false }]
+    render(<Rotas />)
+    expect(screen.getByRole('button', { name: 'Nova rota' })).toBeEnabled()
+  })
+
+  it('assinatura inativa explica por que não dá para criar', () => {
+    limiteRotas = 0
+    render(<Rotas />)
+    expect(screen.getByTestId('uso-rotas')).toHaveTextContent('Sua assinatura não está ativa')
+    expect(screen.getByRole('button', { name: 'Nova rota' })).toBeDisabled()
+  })
+
+  it('administrador não vê contador nem limite', () => {
+    limiteRotas = null
+    estado.rotas = [rotaLisboa]
+    render(<Rotas />)
+    expect(screen.queryByTestId('uso-rotas')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Nova rota' })).toBeEnabled()
+  })
+
   it('abrir a tela marca os alertas como vistos', () => {
     render(<Rotas />)
     expect(marcarVistos).toHaveBeenCalled()

@@ -3,6 +3,7 @@ import { useState, type FormEvent } from 'react'
 import { CampoTexto } from '@/components/CampoTexto'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/contexts/useAuth'
+import { usePlano } from '@/hooks/usePlano'
 import type { Perfil } from '@/contexts/auth-context'
 import { interpretarMilheiro, milheiroParaCampo } from '@/lib/milheiro'
 
@@ -78,6 +79,7 @@ function FormularioDados({ perfil }: { perfil: Perfil }) {
 
 export function Conta() {
   const { user, perfil, sair } = useAuth()
+  const { plano } = usePlano()
 
   return (
     <div className="mx-auto flex w-full max-w-lg flex-col gap-6">
@@ -103,6 +105,11 @@ export function Conta() {
               ? `${nomesPlano[perfil.plano] ?? perfil.plano}, ${descricaoStatus[perfil.status_assinatura] ?? perfil.status_assinatura}.`
               : 'Você ainda não assinou um plano.'}
           </p>
+          {plano && perfil.status_assinatura === 'ativo' && (
+            <p className="text-sm text-texto-secundario">
+              Até {plano.destinos_por_dia} destinos diferentes por dia e {plano.rotas_com_alerta} rotas com alerta.
+            </p>
+          )}
         </section>
       )}
 

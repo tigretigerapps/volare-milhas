@@ -6,7 +6,7 @@ import {
   formatarData,
   formatarPeriodo,
   formularioVazio,
-  hojeISO,
+  mensagemErroRota,
   rotaParaFormulario,
   validarRota,
   type FormularioRota,
@@ -134,8 +134,15 @@ describe('formatação', () => {
     expect(descreverCompanhias([])).toBe('todas as companhias')
     expect(descreverCompanhias(['AZUL', 'GOL'])).toBe('Azul Fidelidade e Smiles (Gol)')
   })
+})
 
-  it('hoje em formato ISO local', () => {
-    expect(hojeISO(new Date(2026, 9, 5))).toBe('2026-10-05')
+describe('mensagemErroRota', () => {
+  it('explica o limite do plano', () => {
+    expect(mensagemErroRota({ message: 'limite_rotas' }, 'padrão')).toMatch(/limite de rotas ativas do seu plano/)
+  })
+
+  it('qualquer outro erro usa a mensagem padrão', () => {
+    expect(mensagemErroRota({ message: 'outra coisa' }, 'padrão')).toBe('padrão')
+    expect(mensagemErroRota(null, 'padrão')).toBe('padrão')
   })
 })

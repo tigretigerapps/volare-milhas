@@ -43,5 +43,6 @@ describe('formato', () => {
     expect(formatarParadas([])).toBe('direto')
     expect(formatarParadas(['BSB'])).toBe('1 parada em BSB')
     expect(formatarParadas(['BSB', 'REC'])).toBe('2 paradas em BSB e REC')
+    expect(formatarParadas([''])).toBe('1 parada')
   })
 })

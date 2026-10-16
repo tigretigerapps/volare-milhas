@@ -18,6 +18,10 @@ export type Oferta = {
   milhas: number
   /** Taxas cobradas na emissão com milhas, em reais. */
   taxas: number
+  /** Só nas ofertas vindas da busca; as de exemplo são todas de ida. */
+  sentido?: 'ida' | 'volta'
+  /** "AAAA-MM-DD" do voo, só nas ofertas vindas da busca. */
+  dataVoo?: string
 }
 
 /** Quanto o usuário paga, em reais, por 1.000 milhas. */

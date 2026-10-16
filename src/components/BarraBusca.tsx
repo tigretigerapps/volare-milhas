@@ -3,6 +3,7 @@ import { useState, type FormEvent } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { hojeISO } from '@/lib/datas'
 
 export type ParametrosBusca = {
   origem: string
@@ -14,11 +15,13 @@ export type ParametrosBusca = {
 type Props = {
   inicial: ParametrosBusca
   onBuscar: (parametros: ParametrosBusca) => void
+  /** Enquanto a busca está em andamento, o botão fica desligado. */
+  buscando?: boolean
 }
 
 const somenteLetras = (valor: string) => valor.replace(/[^a-z]/gi, '').toUpperCase().slice(0, 3)
 
-export function BarraBusca({ inicial, onBuscar }: Props) {
+export function BarraBusca({ inicial, onBuscar, buscando = false }: Props) {
   const [parametros, setParametros] = useState(inicial)
   // "Volta" mostra o placeholder "Só ida" até o usuário escolher uma data.
   const [voltaComoData, setVoltaComoData] = useState(Boolean(inicial.volta))
@@ -68,6 +71,7 @@ export function BarraBusca({ inicial, onBuscar }: Props) {
         <Input
           id="busca-ida"
           type="date"
+          min={hojeISO()}
           value={parametros.ida}
           onChange={(e) => atualizar('ida', e.target.value)}
           className="tabular-nums"
@@ -103,8 +107,8 @@ export function BarraBusca({ inicial, onBuscar }: Props) {
         />
       </div>
 
-      <Button type="submit" className="col-span-2 md:col-span-1">
-        Buscar
+      <Button type="submit" className="col-span-2 md:col-span-1" disabled={buscando}>
+        {buscando ? 'Buscando…' : 'Buscar'}
       </Button>
     </form>
   )
