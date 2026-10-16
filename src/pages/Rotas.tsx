@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { FormularioRota } from '@/components/FormularioRota'
 import { LinhaRota } from '@/components/LinhaRota'
 import { Button } from '@/components/ui/button'
+import { useAlertas } from '@/contexts/useAlertas'
 import { useRotas } from '@/hooks/useRotas'
 import { formularioVazio, rotaParaFormulario, type DadosRota } from '@/lib/rotas'
 
@@ -11,9 +12,15 @@ type Edicao = null | 'nova' | string
 
 export function Rotas() {
   const { rotas, carregando, erroCarga, criar, atualizar, excluir } = useRotas()
+  const { marcarVistos } = useAlertas()
   const [edicao, setEdicao] = useState<Edicao>(null)
 
   const formulario = useRef<HTMLDivElement>(null)
+
+  // Abrir esta tela é "ver os alertas": zera o badge da barra superior.
+  useEffect(() => {
+    marcarVistos()
+  }, [marcarVistos])
 
   // Ao abrir o formulário (inclusive editando uma rota lá embaixo), leva o usuário até ele.
   useEffect(() => {

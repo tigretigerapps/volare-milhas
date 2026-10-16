@@ -5,8 +5,9 @@ import { FaixaAlerta } from '@/components/FaixaAlerta'
 import { LinhaResultado } from '@/components/LinhaResultado'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { useAlertas } from '@/contexts/useAlertas'
 import { useAuth } from '@/contexts/useAuth'
-import { alertaExemplo, milheiroExemplo, ofertasExemplo } from '@/data/exemplo'
+import { milheiroExemplo, ofertasExemplo } from '@/data/exemplo'
 import { ordenarOfertas, type CriterioOrdenacao } from '@/lib/comparacao'
 import { formatarReaisComCentavos } from '@/lib/formato'
 import { interpretarMilheiro, milheiroParaCampo } from '@/lib/milheiro'
@@ -98,6 +99,7 @@ function MilheiroUsuario({
 
 export function Buscar() {
   const { user, perfil, atualizarPerfil } = useAuth()
+  const { recente: alertaRecente } = useAlertas()
   // Sem conta, o milheiro vale só nesta tela; com conta, vem do perfil e é salvo nele.
   const [milheiroLocal, setMilheiroLocal] = useState(milheiroExemplo)
   const milheiro = (user && perfil?.custo_milheiro) || milheiroLocal
@@ -158,7 +160,7 @@ export function Buscar() {
         </ul>
       </section>
 
-      <FaixaAlerta alerta={alertaExemplo} />
+      {alertaRecente && <FaixaAlerta alerta={alertaRecente} />}
     </div>
   )
 }

@@ -20,14 +20,6 @@ export type Oferta = {
   taxas: number
 }
 
-export type AlertaPrecoAlvo = {
-  origem: string
-  destino: string
-  programa: string
-  milhas: number
-  meta: number
-}
-
 /** Quanto o usuário paga, em reais, por 1.000 milhas. */
 export const milheiroExemplo = 20
 
@@ -89,14 +81,3 @@ export const ofertasExemplo: Oferta[] = [
     taxas: 37.41,
   },
 ]
-
-export const alertaExemplo: AlertaPrecoAlvo = {
-  origem: 'GRU',
-  destino: 'LIS',
-  programa: 'TAP',
-  milhas: 35000,
-  meta: 40000,
-}
-
-/** Quantas rotas monitoradas têm alerta novo (badge de "Minhas rotas"). */
-export const alertasNaoLidosExemplo = 1

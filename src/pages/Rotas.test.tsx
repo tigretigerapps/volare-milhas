@@ -18,6 +18,11 @@ vi.mock('@/hooks/useRotas', () => ({
   useRotas: () => ({ ...estado, ...acoes }),
 }))
 
+const marcarVistos = vi.fn()
+vi.mock('@/contexts/useAlertas', () => ({
+  useAlertas: () => ({ alertas: [], naoVistos: 0, recente: null, marcarVistos }),
+}))
+
 const rotaLisboa: Rota = {
   id: 'r1',
   user_id: 'u1',
@@ -46,6 +51,11 @@ afterEach(() => {
 })
 
 describe('Minhas rotas', () => {
+  it('abrir a tela marca os alertas como vistos', () => {
+    render(<Rotas />)
+    expect(marcarVistos).toHaveBeenCalled()
+  })
+
   it('sem rotas, mostra o estado vazio e abre o formulário', async () => {
     const user = userEvent.setup()
     render(<Rotas />)
