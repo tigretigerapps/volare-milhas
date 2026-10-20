@@ -8,6 +8,8 @@ import { Buscar } from '@/pages/Buscar'
 import { Cadastro } from '@/pages/Cadastro'
 import { Conta } from '@/pages/Conta'
 import { Entrar } from '@/pages/Entrar'
+import { EsqueciSenha } from '@/pages/EsqueciSenha'
+import { NovaSenha } from '@/pages/NovaSenha'
 import { Rotas } from '@/pages/Rotas'
 
 export default function App() {
@@ -21,6 +23,8 @@ export default function App() {
               <Route path="buscar" element={<Buscar />} />
               <Route path="entrar" element={<Entrar />} />
               <Route path="cadastro" element={<Cadastro />} />
+              <Route path="esqueci-senha" element={<EsqueciSenha />} />
+              <Route path="nova-senha" element={<NovaSenha />} />
               <Route
                 path="rotas"
                 element={
