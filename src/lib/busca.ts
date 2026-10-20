@@ -103,11 +103,11 @@ export function separarPorSentido(ofertas: readonly Oferta[]): { ida: Oferta[]; 
  * Converte o erro de supabase.functions.invoke na mensagem em português que a função devolveu
  * (limite do plano, assinatura inativa...). Sem corpo legível, cai numa mensagem genérica.
  */
-export async function lerErroFuncao(erro: unknown): Promise<ErroBusca> {
-  const generico: ErroBusca = {
-    codigo: 'erro',
-    mensagem: 'Não foi possível buscar agora. Tente de novo em instantes.',
-  }
+export async function lerErroFuncao(
+  erro: unknown,
+  mensagemGenerica = 'Não foi possível buscar agora. Tente de novo em instantes.',
+): Promise<ErroBusca> {
+  const generico: ErroBusca = { codigo: 'erro', mensagem: mensagemGenerica }
   if (typeof erro !== 'object' || erro === null) return generico
   const e = erro as { name?: string; context?: unknown }
 

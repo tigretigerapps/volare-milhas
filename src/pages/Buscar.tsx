@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { useAlertas } from '@/contexts/useAlertas'
 import { useAuth } from '@/contexts/useAuth'
 import { useBuscaVoos } from '@/hooks/useBuscaVoos'
+import { useLeads, type EstadoLead } from '@/hooks/useLeads'
 import { milheiroExemplo, ofertasExemplo, type Oferta } from '@/data/exemplo'
 import { companhiasPadrao, separarPorSentido } from '@/lib/busca'
 import { ordenarOfertas, type CriterioOrdenacao } from '@/lib/comparacao'
@@ -121,12 +122,16 @@ function GrupoResultados({
   milheiro,
   criterio,
   vazio,
+  onQuero,
+  leads,
 }: {
   titulo?: string
   ofertas: Oferta[]
   milheiro: number
   criterio: CriterioOrdenacao
   vazio: string
+  onQuero: (oferta: Oferta) => void
+  leads: Record<string, EstadoLead>
 }) {
   const ordenadas = ordenarOfertas(ofertas, criterio, milheiro)
   return (
@@ -137,7 +142,7 @@ function GrupoResultados({
       ) : (
         <ul className="divide-y divide-fio border-y border-fio">
           {ordenadas.map((oferta) => (
-            <LinhaResultado key={oferta.id} oferta={oferta} milheiro={milheiro} />
+            <LinhaResultado key={oferta.id} oferta={oferta} milheiro={milheiro} onQuero={onQuero} lead={leads[oferta.id]} />
           ))}
         </ul>
       )}
@@ -150,6 +155,7 @@ export function Buscar() {
   const { user, perfil, atualizarPerfil } = useAuth()
   const { recente: alertaRecente } = useAlertas()
   const { estado, buscar } = useBuscaVoos()
+  const { estados: leads, querer } = useLeads()
   // Sem conta, o milheiro vale só nesta tela; com conta, vem do perfil e é salvo nele.
   const [milheiroLocal, setMilheiroLocal] = useState(milheiroExemplo)
   const milheiro = (user && perfil?.custo_milheiro) || milheiroLocal
@@ -185,6 +191,14 @@ export function Buscar() {
   }
 
   const pronto = estado.tipo === 'pronto' ? estado : null
+
+  const aoQuerer = (oferta: Oferta) => {
+    if (!user || !pronto) {
+      navigate('/entrar', { state: { de: '/buscar' } })
+      return
+    }
+    void querer(oferta, pronto.pedido)
+  }
   const uso = pronto?.uso ?? (estado.tipo === 'erro' ? estado.erro.uso : undefined)
   // Sem conta, a tela mostra os exemplos fixos; com conta, só o que a busca devolveu.
   const ofertas = user ? (pronto?.ofertas ?? []) : ofertasExemplo
@@ -267,6 +281,8 @@ export function Buscar() {
             milheiro={milheiro}
             criterio={criterio}
             vazio="Nenhum voo com preço em dinheiro e em milhas para esta busca."
+            onQuero={aoQuerer}
+            leads={leads}
           />
           {comVolta && pronto?.pedido.dataVolta && (
             <GrupoResultados
@@ -275,6 +291,8 @@ export function Buscar() {
               milheiro={milheiro}
               criterio={criterio}
               vazio="Nenhum voo com preço em dinheiro e em milhas para a volta."
+              onQuero={aoQuerer}
+              leads={leads}
             />
           )}
         </>

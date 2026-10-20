@@ -19,6 +19,6 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["vite.config.ts", "tailwind.config.ts", "supabase/functions/buscar-voos/**/*.ts"],
-  "exclude": ["supabase/functions/buscar-voos/index.ts"]
+  "include": ["vite.config.ts", "tailwind.config.ts", "supabase/functions/buscar-voos/**/*.ts", "supabase/functions/criar-lead/**/*.ts"],
+  "exclude": ["supabase/functions/buscar-voos/index.ts", "supabase/functions/criar-lead/index.ts"]
 }
