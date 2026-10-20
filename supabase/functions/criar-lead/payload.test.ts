@@ -61,6 +61,7 @@ describe('montarSolicitacao', () => {
       data_ida: '2026-12-15',
       data_volta: '2026-12-20',
       passageiro_adulto: '1',
+      flexibilidade: 'N',
     })
     expect(s.observacao).toContain('VM-AB12CD34')
     expect(s.observacao).toContain('GOL, voo 1234, voo direto, saída 08:10, chegada 10:30')

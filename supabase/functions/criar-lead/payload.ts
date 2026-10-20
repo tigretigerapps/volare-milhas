@@ -47,6 +47,8 @@ export type SolicitacaoIddas = {
   data_ida: string
   data_volta?: string
   passageiro_adulto: string
+  /** O CRM exige S ou N. */
+  flexibilidade: 'S' | 'N'
   observacao: string
   canal_venda?: string
 }
@@ -131,6 +133,8 @@ export function montarSolicitacao(d: DadosLead, canalVenda?: string): Solicitaca
     destino: cidade(d.cidadeDestino, codigoDestino),
     data_ida: dataIda,
     passageiro_adulto: '1',
+    // A oferta escolhida tem data e voo definidos: sem flexibilidade de datas.
+    flexibilidade: 'N',
     observacao,
   }
   if (d.email) solicitacao.email = d.email

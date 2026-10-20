@@ -91,6 +91,7 @@ Deno.serve(async (req: Request) => {
   const desde = new Date(Date.now() - 24 * 3_600_000).toISOString()
 
   // Mesma oferta pedida de novo em 24 horas: devolve o lead que já existe, sem duplicar no CRM.
+  // Se aquele lead falhou no CRM, este novo clique tenta enviar o mesmo lead outra vez.
   const { data: existente } = await db
     .from('leads')
     .select('id, crm_status')
@@ -100,7 +101,7 @@ Deno.serve(async (req: Request) => {
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle()
-  if (existente) {
+  if (existente && existente.crm_status !== 'falhou') {
     return responder({
       lead_id: existente.id,
       referencia: `VM-${String(existente.id).slice(0, 8).toUpperCase()}`,
@@ -109,26 +110,32 @@ Deno.serve(async (req: Request) => {
     })
   }
 
-  if (!admin) {
-    const { count } = await db
-      .from('leads')
-      .select('id', { count: 'exact', head: true })
-      .eq('user_id', usuario.id)
-      .gte('created_at', desde)
-    if ((count ?? 0) >= MAX_LEADS_POR_DIA) {
-      return erro(429, 'limite_leads', 'Você já enviou muitos pedidos hoje. Nossa equipe vai falar com você em breve.')
+  let lead: { id: string }
+  if (existente) {
+    lead = { id: existente.id }
+  } else {
+    if (!admin) {
+      const { count } = await db
+        .from('leads')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', usuario.id)
+        .gte('created_at', desde)
+      if ((count ?? 0) >= MAX_LEADS_POR_DIA) {
+        return erro(429, 'limite_leads', 'Você já enviou muitos pedidos hoje. Nossa equipe vai falar com você em breve.')
+      }
     }
-  }
 
-  // Grava primeiro: o pedido do cliente nunca se perde, mesmo que o CRM esteja fora do ar.
-  const { data: lead, error: erroLead } = await db
-    .from('leads')
-    .insert({ user_id: usuario.id, oferta_id: pedido.ofertaId, oferta: oferta as never })
-    .select('id')
-    .single()
-  if (erroLead || !lead) {
-    console.error('falha ao gravar o lead', erroLead?.message)
-    return erro(500, 'erro', 'Não foi possível registrar seu pedido agora. Tente de novo em instantes.')
+    // Grava primeiro: o pedido do cliente nunca se perde, mesmo que o CRM esteja fora do ar.
+    const { data: novo, error: erroLead } = await db
+      .from('leads')
+      .insert({ user_id: usuario.id, oferta_id: pedido.ofertaId, oferta: oferta as never })
+      .select('id')
+      .single()
+    if (erroLead || !novo) {
+      console.error('falha ao gravar o lead', erroLead?.message)
+      return erro(500, 'erro', 'Não foi possível registrar seu pedido agora. Tente de novo em instantes.')
+    }
+    lead = novo
   }
 
   const referencia = `VM-${String(lead.id).slice(0, 8).toUpperCase()}`
@@ -163,7 +170,7 @@ Deno.serve(async (req: Request) => {
     const idCrm = await criarSolicitacao(chaveCrm, solicitacao)
     await db
       .from('leads')
-      .update({ crm_status: 'enviado', crm_id: idCrm, crm_enviado_em: new Date().toISOString() })
+      .update({ crm_status: 'enviado', crm_id: idCrm, crm_enviado_em: new Date().toISOString(), crm_erro: null })
       .eq('id', lead.id)
     console.log(JSON.stringify({ usuario: usuario.id.slice(0, 8), lead: referencia, crm: 'enviado', id_crm: idCrm }))
     return responder({ modo: 'real', lead_id: lead.id, referencia, ja_existia: false, enviado_ao_crm: true })
