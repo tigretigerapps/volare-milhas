@@ -40,6 +40,43 @@ function chaveDeServico(): string {
 const COLUNAS_OFERTA =
   'origem, destino, data_voo, sentido, companhia, programa, tipo_milhas, numero_voo, cabine, conexoes, partida, chegada, milhas, taxas_rs, valor_dinheiro_rs'
 
+// Painel administrativo: reenvia ao CRM um lead que falhou, com o pedido exato que foi guardado nele.
+// deno-lint-ignore no-explicit-any
+async function reenviar(db: any, adminId: string, leadId: unknown): Promise<Response> {
+  const { data: quem } = await db.from('profiles').select('papel').eq('id', adminId).maybeSingle()
+  if (quem?.papel !== 'admin') return erro(403, 'sem_permissao', 'Só administradores podem reenviar leads.')
+  if (typeof leadId !== 'string' || !/^[0-9a-f-]{36}$/i.test(leadId)) return erro(400, 'pedido_invalido', 'Lead inválido.')
+
+  const { data: lead } = await db.from('leads').select('id, crm_status, crm_payload').eq('id', leadId).maybeSingle()
+  if (!lead) return erro(404, 'lead_nao_encontrado', 'Lead não encontrado.')
+  if (lead.crm_status !== 'falhou') {
+    return erro(409, 'lead_nao_reenviavel', 'Só leads que falharam no envio podem ser reenviados.')
+  }
+  if (!lead.crm_payload) {
+    return erro(422, 'sem_pedido_guardado', 'Este lead não tem o pedido original guardado. Registre-o direto no CRM.')
+  }
+
+  const chaveCrm = Deno.env.get('IDDAS_CHAVE') ?? ''
+  if (Deno.env.get('IDDAS_MODO') !== 'real' || chaveCrm === '') {
+    return erro(409, 'crm_desligado', 'O envio real ao CRM está desligado (segredos IDDAS_MODO e IDDAS_CHAVE).')
+  }
+
+  try {
+    const idCrm = await criarSolicitacao(chaveCrm, lead.crm_payload)
+    await db
+      .from('leads')
+      .update({ crm_status: 'enviado', crm_id: idCrm, crm_enviado_em: new Date().toISOString(), crm_erro: null })
+      .eq('id', lead.id)
+    console.log(JSON.stringify({ lead: String(lead.id).slice(0, 8), crm: 'reenviado', id_crm: idCrm }))
+    return responder({ crm_status: 'enviado', crm_id: idCrm })
+  } catch (e) {
+    const motivo = e instanceof Error ? e.message : 'erro desconhecido'
+    console.error('falha ao reenviar ao CRM', String(lead.id).slice(0, 8), motivo)
+    await db.from('leads').update({ crm_erro: motivo.slice(0, 500) }).eq('id', lead.id)
+    return erro(502, 'crm_recusou', `O CRM não aceitou o pedido: ${motivo.slice(0, 200)}`)
+  }
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: cabecalhosCors })
   if (req.method !== 'POST') return erro(405, 'metodo_invalido', 'Use POST.')
@@ -61,6 +98,10 @@ Deno.serve(async (req: Request) => {
   } catch {
     return erro(400, 'pedido_invalido', 'Pedido inválido.')
   }
+  if (typeof corpo === 'object' && corpo !== null && (corpo as Record<string, unknown>).acao === 'reenviar') {
+    return await reenviar(db, usuario.id, (corpo as Record<string, unknown>).lead_id)
+  }
+
   const validacao = validarPedidoLead(corpo)
   if (!validacao.ok) return erro(400, 'pedido_invalido', validacao.mensagem)
   const pedido = validacao.pedido
@@ -159,6 +200,9 @@ Deno.serve(async (req: Request) => {
 
   const chaveCrm = Deno.env.get('IDDAS_CHAVE') ?? ''
   const modoReal = Deno.env.get('IDDAS_MODO') === 'real' && chaveCrm !== ''
+
+  // Guarda o pedido exato: o reenvio pelo painel administrativo usa este corpo.
+  await db.from('leads').update({ crm_payload: solicitacao }).eq('id', lead.id)
 
   if (!modoReal) {
     await db.from('leads').update({ crm_status: 'simulado' }).eq('id', lead.id)

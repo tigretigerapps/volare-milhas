@@ -137,28 +137,46 @@ export type Database = {
       }
       leads: {
         Row: {
+          crm_erro: string | null
+          crm_enviado_em: string | null
+          crm_id: number | null
+          crm_payload: Json | null
+          crm_status: string
           created_at: string
           id: string
           mensagem: string | null
           oferta: Json
+          oferta_id: string | null
           status: string
           updated_at: string
           user_id: string
         }
         Insert: {
+          crm_erro?: string | null
+          crm_enviado_em?: string | null
+          crm_id?: number | null
+          crm_payload?: Json | null
+          crm_status?: string
           created_at?: string
           id?: string
           mensagem?: string | null
           oferta: Json
+          oferta_id?: string | null
           status?: string
           updated_at?: string
           user_id?: string
         }
         Update: {
+          crm_erro?: string | null
+          crm_enviado_em?: string | null
+          crm_id?: number | null
+          crm_payload?: Json | null
+          crm_status?: string
           created_at?: string
           id?: string
           mensagem?: string | null
           oferta?: Json
+          oferta_id?: string | null
           status?: string
           updated_at?: string
           user_id?: string

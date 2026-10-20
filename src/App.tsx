@@ -1,9 +1,11 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router'
 
 import { Layout } from '@/components/Layout'
+import { RotaAdmin } from '@/components/RotaAdmin'
 import { RotaProtegida } from '@/components/RotaProtegida'
 import { AlertasProvider } from '@/contexts/AlertasProvider'
 import { AuthProvider } from '@/contexts/AuthProvider'
+import { Admin } from '@/pages/Admin'
 import { Buscar } from '@/pages/Buscar'
 import { Cadastro } from '@/pages/Cadastro'
 import { Conta } from '@/pages/Conta'
@@ -39,6 +41,14 @@ export default function App() {
                   <RotaProtegida>
                     <Conta />
                   </RotaProtegida>
+                }
+              />
+              <Route
+                path="admin"
+                element={
+                  <RotaAdmin>
+                    <Admin />
+                  </RotaAdmin>
                 }
               />
               <Route path="*" element={<Navigate to="/buscar" replace />} />

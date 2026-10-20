@@ -7,6 +7,8 @@ import { cn } from '@/lib/utils'
 
 type Props = {
   alertasNaoLidos: number
+  /** Mostra o link do painel administrativo. */
+  admin?: boolean
 }
 
 const links = [
@@ -14,6 +16,8 @@ const links = [
   { para: '/rotas', rotulo: 'Minhas rotas', comBadge: true },
   { para: '/conta', rotulo: 'Conta' },
 ] as const
+
+const linkAdmin = { para: '/admin', rotulo: 'Painel' } as const
 
 function Badge({ valor }: { valor: number }) {
   return (
@@ -26,8 +30,9 @@ function Badge({ valor }: { valor: number }) {
   )
 }
 
-export function BarraSuperior({ alertasNaoLidos }: Props) {
+export function BarraSuperior({ alertasNaoLidos, admin = false }: Props) {
   const [menuAberto, setMenuAberto] = useState(false)
+  const itens = admin ? [...links, linkAdmin] : links
 
   return (
     <header className="bg-primario text-primario-texto">
@@ -38,7 +43,7 @@ export function BarraSuperior({ alertasNaoLidos }: Props) {
 
         <nav aria-label="Principal" className="hidden md:block">
           <ul className="flex items-center gap-1">
-            {links.map((link) => (
+            {itens.map((link) => (
               <li key={link.para}>
                 <NavLink
                   to={link.para}
@@ -72,7 +77,7 @@ export function BarraSuperior({ alertasNaoLidos }: Props) {
             <SheetDescription className="sr-only">Navegação principal</SheetDescription>
             <nav aria-label="Principal">
               <ul className="flex flex-col">
-                {links.map((link) => (
+                {itens.map((link) => (
                   <li key={link.para} className="border-b border-fio last:border-b-0">
                     <NavLink
                       to={link.para}
