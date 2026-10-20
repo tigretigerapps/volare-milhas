@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 
+import { CampoAeroporto } from '@/components/CampoAeroporto'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -19,8 +20,6 @@ type Props = {
   onSalvar: (dados: DadosRota) => Promise<{ erro: string | null }>
   onCancelar: () => void
 }
-
-const somenteLetras = (valor: string) => valor.replace(/[^a-z]/gi, '').toUpperCase().slice(0, 3)
 
 function Erro({ id, texto }: { id: string; texto?: string }) {
   if (!texto) return null
@@ -76,27 +75,24 @@ export function FormularioRota({ titulo, inicial, onSalvar, onCancelar }: Props)
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="rota-origem">De</Label>
-          <Input
+          <CampoAeroporto
             id="rota-origem"
-            value={valores.origem}
-            onChange={(e) => atualizar('origem', somenteLetras(e.target.value))}
+            rotulo="De"
+            valor={valores.origem}
+            onChange={(codigo) => atualizar('origem', codigo)}
             placeholder="GRU"
-            autoComplete="off"
-            className="font-display text-lg font-light tracking-wide"
             {...invalido('origem')}
           />
           <Erro id="rota-origem-erro" texto={erros.origem} />
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="rota-destino">Para</Label>
-          <Input
+          <CampoAeroporto
             id="rota-destino"
-            value={valores.destino}
-            onChange={(e) => atualizar('destino', somenteLetras(e.target.value))}
+            rotulo="Para"
+            valor={valores.destino}
+            onChange={(codigo) => atualizar('destino', codigo)}
             placeholder="LIS"
-            autoComplete="off"
-            className="font-display text-lg font-light tracking-wide"
+            alinhar="direita"
             {...invalido('destino')}
           />
           <Erro id="rota-destino-erro" texto={erros.destino} />

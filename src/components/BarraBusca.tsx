@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 
+import { CampoAeroporto } from '@/components/CampoAeroporto'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -19,8 +20,6 @@ type Props = {
   buscando?: boolean
 }
 
-const somenteLetras = (valor: string) => valor.replace(/[^a-z]/gi, '').toUpperCase().slice(0, 3)
-
 export function BarraBusca({ inicial, onBuscar, buscando = false }: Props) {
   const [parametros, setParametros] = useState(inicial)
   // "Volta" mostra o placeholder "Só ida" até o usuário escolher uma data.
@@ -37,34 +36,27 @@ export function BarraBusca({ inicial, onBuscar, buscando = false }: Props) {
   return (
     <form
       onSubmit={enviar}
-      className="grid grid-cols-2 gap-3 rounded-md border border-fio bg-superficie p-4 md:grid-cols-[repeat(2,minmax(0,6.5rem))_repeat(2,minmax(0,1fr))_auto] md:items-end"
+      className="grid grid-cols-2 gap-3 rounded-md border border-fio bg-superficie p-4 md:grid-cols-[repeat(2,minmax(0,1.4fr))_repeat(2,minmax(0,1fr))_auto] md:items-start"
       aria-label="Buscar voos"
     >
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="busca-origem">De</Label>
-        <Input
-          id="busca-origem"
-          value={parametros.origem}
-          onChange={(e) => atualizar('origem', somenteLetras(e.target.value))}
-          placeholder="GRU"
-          autoComplete="off"
-          className="font-display text-lg font-light tracking-wide"
-          required
-        />
-      </div>
+      <CampoAeroporto
+        id="busca-origem"
+        rotulo="De"
+        valor={parametros.origem}
+        onChange={(codigo) => atualizar('origem', codigo)}
+        placeholder="GRU"
+        required
+      />
 
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="busca-destino">Para</Label>
-        <Input
-          id="busca-destino"
-          value={parametros.destino}
-          onChange={(e) => atualizar('destino', somenteLetras(e.target.value))}
-          placeholder="SSA"
-          autoComplete="off"
-          className="font-display text-lg font-light tracking-wide"
-          required
-        />
-      </div>
+      <CampoAeroporto
+        id="busca-destino"
+        rotulo="Para"
+        valor={parametros.destino}
+        onChange={(codigo) => atualizar('destino', codigo)}
+        placeholder="SSA"
+        alinhar="direita"
+        required
+      />
 
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="busca-ida">Ida</Label>
