@@ -12,6 +12,7 @@ import {
   type LeadAdmin,
   type Plano,
 } from '@/hooks/useAdmin'
+import { interpretarDecimalBR } from '@/lib/numero-br'
 import { formatarDataHora, referenciaLead, resumirOferta, rotuloCrm, statusAssinatura, statusLead } from '@/lib/admin'
 import { cn } from '@/lib/utils'
 
@@ -156,9 +157,10 @@ function Assinantes() {
   )
 }
 
-function FormularioPlano({ plano, onSalvar }: { plano: Plano; onSalvar: (plano: string, l: Pick<Plano, 'destinos_por_dia' | 'rotas_com_alerta'>) => Promise<{ erro: string | null }> }) {
+function FormularioPlano({ plano, onSalvar }: { plano: Plano; onSalvar: (plano: string, l: Pick<Plano, 'destinos_por_dia' | 'rotas_com_alerta' | 'preco_mensal'>) => Promise<{ erro: string | null }> }) {
   const [destinos, setDestinos] = useState(String(plano.destinos_por_dia))
   const [rotas, setRotas] = useState(String(plano.rotas_com_alerta))
+  const [preco, setPreco] = useState(String(plano.preco_mensal).replace('.', ','))
   const [mensagem, setMensagem] = useState<{ erro: boolean; texto: string } | null>(null)
   const [salvando, setSalvando] = useState(false)
 
@@ -172,8 +174,13 @@ function FormularioPlano({ plano, onSalvar }: { plano: Plano; onSalvar: (plano: 
       setMensagem({ erro: true, texto: 'Use números inteiros, de 0 para cima.' })
       return
     }
+    const p = interpretarDecimalBR(preco)
+    if (p === null) {
+      setMensagem({ erro: true, texto: 'Preço inválido. Use um valor como 29,90.' })
+      return
+    }
     setSalvando(true)
-    const { erro } = await onSalvar(plano.plano, { destinos_por_dia: d, rotas_com_alerta: r })
+    const { erro } = await onSalvar(plano.plano, { destinos_por_dia: d, rotas_com_alerta: r, preco_mensal: p })
     setSalvando(false)
     setMensagem(erro ? { erro: true, texto: erro } : { erro: false, texto: 'Salvo.' })
   }
@@ -190,6 +197,10 @@ function FormularioPlano({ plano, onSalvar }: { plano: Plano; onSalvar: (plano: 
           <Label htmlFor={`rotas-${plano.plano}`}>Rotas com alerta</Label>
           <Input id={`rotas-${plano.plano}`} inputMode="numeric" value={rotas} onChange={(e) => setRotas(e.target.value)} className="tabular-nums" />
         </div>
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor={`preco-${plano.plano}`}>Preço mensal (R$)</Label>
+        <Input id={`preco-${plano.plano}`} inputMode="decimal" value={preco} onChange={(e) => setPreco(e.target.value)} className="tabular-nums" />
       </div>
       <div className="flex items-center gap-3">
         <Button type="submit" size="sm" disabled={salvando}>
@@ -216,7 +227,7 @@ function Planos() {
         ))}
       </div>
       <p className="mt-3 text-sm text-texto-secundario">
-        O novo limite vale na próxima busca ou rota de cada assinante.
+        O novo limite vale na próxima busca ou rota de cada assinante. O novo preço vale para quem assinar a partir de agora; quem já assina continua com o valor combinado no Asaas.
       </p>
     </section>
   )

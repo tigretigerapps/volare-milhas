@@ -259,7 +259,19 @@ export function Buscar() {
         <Aviso>Escolha origem, destino e as datas e toque em Buscar para comparar dinheiro e milhas.</Aviso>
       )}
       {estado.tipo === 'carregando' && <Aviso>Buscando ofertas nas companhias…</Aviso>}
-      {estado.tipo === 'erro' && <Aviso alerta>{estado.erro.mensagem}</Aviso>}
+      {estado.tipo === 'erro' && (
+        <Aviso alerta>
+          {estado.erro.mensagem}
+          {estado.erro.codigo === 'assinatura_inativa' && (
+            <>
+              {' '}
+              <Link to="/assinar" className={linkDiscreto}>
+                Ver planos
+              </Link>
+            </>
+          )}
+        </Aviso>
+      )}
 
       {pronto?.modo === 'mock' && (
         <Aviso>

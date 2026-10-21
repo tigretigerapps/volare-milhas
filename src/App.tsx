@@ -6,6 +6,7 @@ import { RotaProtegida } from '@/components/RotaProtegida'
 import { AlertasProvider } from '@/contexts/AlertasProvider'
 import { AuthProvider } from '@/contexts/AuthProvider'
 import { Admin } from '@/pages/Admin'
+import { Assinar } from '@/pages/Assinar'
 import { Buscar } from '@/pages/Buscar'
 import { Cadastro } from '@/pages/Cadastro'
 import { Conta } from '@/pages/Conta'
@@ -40,6 +41,14 @@ export default function App() {
                 element={
                   <RotaProtegida>
                     <Conta />
+                  </RotaProtegida>
+                }
+              />
+              <Route
+                path="assinar"
+                element={
+                  <RotaProtegida>
+                    <Assinar />
                   </RotaProtegida>
                 }
               />

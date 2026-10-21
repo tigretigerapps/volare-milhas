@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import { Link } from 'react-router'
 
 import { CampoTexto } from '@/components/CampoTexto'
 import { Button } from '@/components/ui/button'
@@ -105,6 +106,11 @@ export function Conta() {
               ? `${nomesPlano[perfil.plano] ?? perfil.plano}, ${descricaoStatus[perfil.status_assinatura] ?? perfil.status_assinatura}.`
               : 'Você ainda não assinou um plano.'}
           </p>
+          {perfil.status_assinatura !== 'ativo' && perfil.papel !== 'admin' && (
+            <Button asChild size="sm" className="mt-3">
+              <Link to="/assinar">{perfil.status_assinatura === 'inadimplente' ? 'Regularizar pagamento' : 'Escolher um plano'}</Link>
+            </Button>
+          )}
           {plano && perfil.status_assinatura === 'ativo' && (
             <p className="text-sm text-texto-secundario">
               Até {plano.destinos_por_dia} destinos diferentes por dia e {plano.rotas_com_alerta} rotas com alerta.

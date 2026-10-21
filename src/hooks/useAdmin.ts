@@ -105,7 +105,7 @@ export function usePlanosAdmin() {
   const { itens, setItens, carregando, erroCarga } = useLista<Plano>(carregarPlanos)
 
   const salvar = useCallback(
-    async (plano: string, limites: Pick<Plano, 'destinos_por_dia' | 'rotas_com_alerta'>): Promise<Resultado> => {
+    async (plano: string, limites: Pick<Plano, 'destinos_por_dia' | 'rotas_com_alerta' | 'preco_mensal'>): Promise<Resultado> => {
       const { data, error } = await supabase.from('planos').update(limites).eq('plano', plano).select().maybeSingle()
       if (error || !data) {
         console.error('Erro ao salvar o plano', error)

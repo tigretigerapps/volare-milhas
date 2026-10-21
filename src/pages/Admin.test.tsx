@@ -35,7 +35,7 @@ vi.mock('@/hooks/useAdmin', () => ({
     carregando: false,
     erroCarga: null,
     salvar: salvarPlano,
-    planos: [{ plano: 'base', nome: 'Base', destinos_por_dia: 5, rotas_com_alerta: 2 }],
+    planos: [{ plano: 'base', nome: 'Base', destinos_por_dia: 5, rotas_com_alerta: 2, preco_mensal: 29.9 }],
   }),
 }))
 
@@ -111,7 +111,7 @@ describe('Admin', () => {
     await userEvent.clear(within(form).getByLabelText('Destinos por dia'))
     await userEvent.type(within(form).getByLabelText('Destinos por dia'), '8')
     await userEvent.click(within(form).getByRole('button', { name: 'Salvar' }))
-    expect(salvarPlano).toHaveBeenCalledWith('base', { destinos_por_dia: 8, rotas_com_alerta: 2 })
+    expect(salvarPlano).toHaveBeenCalledWith('base', { destinos_por_dia: 8, rotas_com_alerta: 2, preco_mensal: 29.9 })
 
     await userEvent.clear(within(form).getByLabelText('Rotas com alerta'))
     await userEvent.type(within(form).getByLabelText('Rotas com alerta'), '-1')
