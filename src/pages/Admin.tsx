@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
+  useAlertasAdmin,
   useAssinantesAdmin,
   useLeadsAdmin,
   usePlanosAdmin,
@@ -18,6 +19,7 @@ const abas = [
   { id: 'leads', rotulo: 'Leads' },
   { id: 'assinantes', rotulo: 'Assinantes' },
   { id: 'planos', rotulo: 'Planos' },
+  { id: 'alertas', rotulo: 'Alertas' },
 ] as const
 type Aba = (typeof abas)[number]['id']
 
@@ -220,6 +222,61 @@ function Planos() {
   )
 }
 
+function Alertas() {
+  const { execucoes, carregando, erroCarga, verificarAgora } = useAlertasAdmin()
+  const [verificando, setVerificando] = useState(false)
+  const [mensagem, setMensagem] = useState<{ erro: boolean; texto: string } | null>(null)
+
+  const verificar = async () => {
+    setVerificando(true)
+    setMensagem(null)
+    const { erro, resumo } = await verificarAgora()
+    setVerificando(false)
+    if (erro || !resumo) {
+      setMensagem({ erro: true, texto: erro ?? 'Não foi possível verificar agora.' })
+      return
+    }
+    setMensagem({
+      erro: false,
+      texto: `Verificação concluída: ${resumo.rotas_verificadas} rotas, ${resumo.alertas_gerados} alertas novos.`,
+    })
+  }
+
+  return (
+    <section aria-label="Alertas" className="flex flex-col gap-4">
+      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+        <p className="text-sm text-texto-secundario">
+          O sistema verifica as rotas salvas todo dia às 8h e avisa os assinantes quando um preço bate a meta.
+        </p>
+        <Button size="sm" onClick={() => void verificar()} disabled={verificando}>
+          {verificando ? 'Verificando…' : 'Verificar agora'}
+        </Button>
+      </div>
+      {mensagem && (
+        <p role={mensagem.erro ? 'alert' : 'status'} className="rounded-md border border-fio bg-superficie p-3 text-sm text-texto">
+          {mensagem.texto}
+        </p>
+      )}
+      <Estado carregando={carregando} erro={erroCarga} quantidade={execucoes.length} vazio="Nenhuma verificação ainda." />
+      {execucoes.length > 0 && (
+        <ul className="divide-y divide-fio border-y border-fio">
+          {execucoes.map((e) => (
+            <li key={e.id} className="grid gap-1 py-3 text-sm md:grid-cols-[11rem_8rem_minmax(0,1fr)] md:gap-6">
+              <p className="tabular-nums text-texto">{formatarDataHora(e.iniciado_em)}</p>
+              <p className="text-texto-secundario">{e.origem === 'agendador' ? 'Automática' : 'Manual'}</p>
+              <p className="tabular-nums text-texto-secundario">
+                {e.rotas_verificadas} rotas, {e.buscas} consultas, {e.alertas_gerados} alertas
+                {e.erros > 0 && <span className="text-texto">, {e.erros} falhas</span>}
+                {e.detalhe && <span className="block">{e.detalhe}</span>}
+              </p>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  )
+}
+
 export function Admin() {
   const [aba, setAba] = useState<Aba>('leads')
   return (
@@ -250,6 +307,7 @@ export function Admin() {
         {aba === 'leads' && <Leads />}
         {aba === 'assinantes' && <Assinantes />}
         {aba === 'planos' && <Planos />}
+        {aba === 'alertas' && <Alertas />}
       </div>
     </div>
   )

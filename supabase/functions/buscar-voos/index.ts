@@ -4,6 +4,15 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 import { createClient } from 'npm:@supabase/supabase-js@2.118.0'
 
+import {
+  chaveDaOferta,
+  datasAmostra,
+  deveAlertar,
+  melhorAcerto,
+  ofertaDoAlerta,
+  type OfertaMotor,
+  type RotaAlerta,
+} from './alertas.ts'
 import { avaliarDestinos } from './cota.ts'
 import { hojeSaoPaulo, inicioDoDiaSaoPaulo } from './datas.ts'
 import { fonteMock, fonteReal, type Fonte } from './fonte.ts'
@@ -87,17 +96,137 @@ async function buscarCompanhia(db: any, fonte: Fonte, pedido: PedidoCompanhia): 
   }
 }
 
+/** Teto de consultas por verificação: protege o pacote da API se houver muitas rotas. */
+const MAX_BUSCAS_POR_EXECUCAO = 300
+
+const COLUNAS_OFERTA_MOTOR =
+  'origem, destino, data_voo, sentido, companhia, programa, tipo_milhas, numero_voo, conexoes, partida, chegada, milhas, taxas_rs, valor_dinheiro_rs'
+
+type ResumoExecucao = { rotas_verificadas: number; buscas: number; alertas_gerados: number; erros: number }
+
+/**
+ * Motor de alertas: busca as rotas salvas ativas (de assinantes ativos) nas datas da janela, compara com o
+ * preço-alvo e grava em alertas_enviados o que bateu a meta. Usa o mesmo cache de 24 horas e a mesma fonte
+ * das buscas dos usuários, e não gasta a cota diária de ninguém.
+ */
+// deno-lint-ignore no-explicit-any
+async function verificarAlertas(db: any, origem: 'agendador' | 'manual'): Promise<Obj> {
+  const agora = new Date()
+  const hoje = hojeSaoPaulo(agora)
+  const resumo: ResumoExecucao = { rotas_verificadas: 0, buscas: 0, alertas_gerados: 0, erros: 0 }
+  let detalhe: string | null = null
+
+  const { data: execucao } = await db.from('alertas_execucoes').insert({ origem }).select('id').single()
+  const fonte = Deno.env.get('BUSCA_FONTE') === 'real' ? fonteReal() : fonteMock(db)
+
+  try {
+    const { data: rotas, error: erroRotas } = await db
+      .from('rotas_salvas')
+      .select('id, user_id, origem, destino, data_inicio, data_fim, preco_alvo_milhas, preco_alvo_rs, companhias')
+      .eq('ativo', true)
+      .gte('data_fim', hoje)
+    if (erroRotas) throw erroRotas
+
+    const donos = [...new Set(((rotas ?? []) as RotaAlerta[]).map((r) => r.user_id))]
+    const { data: perfis } = await db.from('profiles').select('id, status_assinatura, papel').in('id', donos)
+    const elegiveis = new Set(
+      ((perfis ?? []) as { id: string; status_assinatura: string; papel: string }[])
+        .filter((p) => p.status_assinatura === 'ativo' || p.papel === 'admin')
+        .map((p) => p.id),
+    )
+
+    for (const rota of (rotas ?? []) as RotaAlerta[]) {
+      if (!elegiveis.has(rota.user_id) || rota.companhias.length === 0) continue
+      const datas = datasAmostra(rota.data_inicio, rota.data_fim, hoje)
+      const tarefas = rota.companhias.flatMap((companhia) => datas.map((data) => ({ companhia, data })))
+      if (tarefas.length === 0) continue
+      if (resumo.buscas + tarefas.length > MAX_BUSCAS_POR_EXECUCAO) {
+        detalhe = `Limite de ${MAX_BUSCAS_POR_EXECUCAO} consultas por verificação atingido; as rotas restantes ficam para a próxima.`
+        break
+      }
+
+      resumo.rotas_verificadas++
+      const resultados = await Promise.all(
+        tarefas.map((t) =>
+          buscarCompanhia(db, fonte, {
+            origem: rota.origem,
+            destino: rota.destino,
+            dataIda: t.data,
+            dataVolta: null,
+            companhia: t.companhia,
+          }),
+        ),
+      )
+      resumo.buscas += tarefas.length
+      resumo.erros += resultados.filter((r) => r.status === 'erro').length
+
+      const buscaIds = resultados.flatMap((r) => (r.status === 'ok' && r.busca_id ? [r.busca_id] : []))
+      if (buscaIds.length === 0) continue
+      const { data: ofertas, error: erroOfertas } = await db
+        .from('ofertas')
+        .select(COLUNAS_OFERTA_MOTOR)
+        .in('busca_id', buscaIds)
+      if (erroOfertas) throw erroOfertas
+
+      const acerto = melhorAcerto(rota, (ofertas ?? []) as OfertaMotor[])
+      if (!acerto) continue
+
+      const { data: ultimo } = await db
+        .from('alertas_enviados')
+        .select('enviado_em, oferta')
+        .eq('rota_id', rota.id)
+        .order('enviado_em', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+      if (!deveAlertar(ultimo, acerto, agora)) continue
+
+      const { error: erroAlerta } = await db.from('alertas_enviados').insert({
+        user_id: rota.user_id,
+        rota_id: rota.id,
+        oferta_chave: chaveDaOferta(rota.id, acerto),
+        oferta: ofertaDoAlerta(acerto),
+        canal: 'app',
+      })
+      // 23505: a mesma oferta já tinha gerado este alerta (corrida entre duas verificações).
+      if (erroAlerta && erroAlerta.code !== '23505') {
+        console.error('falha ao gravar o alerta', erroAlerta.message)
+        resumo.erros++
+      } else if (!erroAlerta) {
+        resumo.alertas_gerados++
+      }
+    }
+  } catch (e) {
+    console.error('falha na verificação de alertas', e instanceof Error ? e.message : JSON.stringify(e))
+    resumo.erros++
+    detalhe = 'A verificação parou por um erro. Veja os registros da função.'
+  }
+
+  if (execucao?.id) {
+    await db.from('alertas_execucoes').update({ concluido_em: new Date().toISOString(), detalhe, ...resumo }).eq('id', execucao.id)
+  }
+  console.log(JSON.stringify({ alertas: origem, ...resumo }))
+  return { ...resumo, detalhe }
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: cabecalhosCors })
   if (req.method !== 'POST') return erro(405, 'metodo_invalido', 'Use POST.')
-
-  const token = (req.headers.get('Authorization') ?? '').replace(/^Bearer\s+/i, '')
-  if (!token) return erro(401, 'nao_autenticado', 'Entre na sua conta para buscar.')
 
   // Cliente com a chave de serviço: só é usado depois de identificar o usuário e checar o plano dele.
   const db = createClient(Deno.env.get('SUPABASE_URL') ?? '', chaveDeServico(), {
     auth: { persistSession: false, autoRefreshToken: false },
   })
+
+  // O agendador do banco (pg_cron) não tem usuário: prova quem é com um segredo guardado no Vault.
+  const segredoAgendador = req.headers.get('x-cron-secret')
+  if (segredoAgendador) {
+    const { data: valido } = await db.rpc('validar_segredo_cron', { p_segredo: segredoAgendador })
+    if (valido !== true) return erro(401, 'nao_autenticado', 'Segredo do agendador inválido.')
+    return responder({ ok: true, ...(await verificarAlertas(db, 'agendador')) })
+  }
+
+  const token = (req.headers.get('Authorization') ?? '').replace(/^Bearer\s+/i, '')
+  if (!token) return erro(401, 'nao_autenticado', 'Entre na sua conta para buscar.')
 
   const { data: sessao, error: erroSessao } = await db.auth.getUser(token)
   if (erroSessao || !sessao.user) return erro(401, 'nao_autenticado', 'Sua sessão expirou. Entre de novo.')
@@ -108,6 +237,13 @@ Deno.serve(async (req: Request) => {
     corpo = await req.json()
   } catch {
     return erro(400, 'pedido_invalido', 'Pedido de busca inválido.')
+  }
+
+  // Painel administrativo: "Verificar agora" roda o motor de alertas na hora.
+  if (typeof corpo === 'object' && corpo !== null && (corpo as Record<string, unknown>).acao === 'verificar_alertas') {
+    const { data: quem } = await db.from('profiles').select('papel').eq('id', usuario.id).maybeSingle()
+    if (quem?.papel !== 'admin') return erro(403, 'sem_permissao', 'Só administradores podem rodar a verificação.')
+    return responder({ ok: true, ...(await verificarAlertas(db, 'manual')) })
   }
 
   const agora = new Date()

@@ -9,6 +9,7 @@ type Resultado = { erro: string | null }
 export type LeadAdmin = Tables<'leads'> & { profiles: Pick<Tables<'profiles'>, 'nome' | 'telefone'> | null }
 export type AssinanteAdmin = Tables<'profiles'> & { assinatura: Tables<'subscriptions'> | null }
 export type Plano = Tables<'planos'>
+export type ExecucaoAlertas = Tables<'alertas_execucoes'>
 
 const falhaCarga = 'Não foi possível carregar. Recarregue a página.'
 
@@ -117,4 +118,30 @@ export function usePlanosAdmin() {
   )
 
   return { planos: itens, carregando, erroCarga, salvar }
+}
+
+const carregarExecucoes = () =>
+  supabase.from('alertas_execucoes').select('*').order('iniciado_em', { ascending: false }).limit(20)
+
+type ResumoVerificacao = { rotas_verificadas: number; buscas: number; alertas_gerados: number; erros: number }
+
+/** Histórico das verificações de alertas e o botão "Verificar agora". */
+export function useAlertasAdmin() {
+  const { itens, carregando, erroCarga, recarregar } = useLista<ExecucaoAlertas>(carregarExecucoes)
+
+  const verificarAgora = useCallback(async (): Promise<Resultado & { resumo?: ResumoVerificacao }> => {
+    const { data, error } = await supabase.functions.invoke<ResumoVerificacao>('buscar-voos', {
+      body: { acao: 'verificar_alertas' },
+    })
+    if (error || !data) {
+      const { mensagem } = error
+        ? await lerErroFuncao(error, 'Não foi possível verificar agora. Tente de novo em instantes.')
+        : { mensagem: 'Não foi possível verificar agora. Tente de novo em instantes.' }
+      return { erro: mensagem }
+    }
+    await recarregar()
+    return { erro: null, resumo: data }
+  }, [recarregar])
+
+  return { execucoes: itens, carregando, erroCarga, verificarAgora }
 }

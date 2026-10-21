@@ -10,6 +10,7 @@ import { Admin } from './Admin'
 const mudarStatus = vi.fn()
 const reenviar = vi.fn()
 const salvarPlano = vi.fn()
+const verificarAgora = vi.fn()
 let leads: LeadAdmin[]
 
 vi.mock('@/hooks/useAdmin', () => ({
@@ -20,6 +21,14 @@ vi.mock('@/hooks/useAdmin', () => ({
     assinantes: [
       { id: 'u1', nome: 'Ana', telefone: '11999990000', plano: 'plus', status_assinatura: 'ativo', papel: 'cliente', assinatura: { proxima_cobranca: '2026-11-15' } },
       { id: 'u2', nome: 'Beto', telefone: null, plano: null, status_assinatura: 'pendente', papel: 'cliente', assinatura: null },
+    ],
+  }),
+  useAlertasAdmin: () => ({
+    carregando: false,
+    erroCarga: null,
+    verificarAgora,
+    execucoes: [
+      { id: 1, iniciado_em: '2026-10-21T11:00:00Z', origem: 'agendador', rotas_verificadas: 2, buscas: 24, alertas_gerados: 1, erros: 0, detalhe: null },
     ],
   }),
   usePlanosAdmin: () => ({
@@ -47,6 +56,7 @@ beforeEach(() => {
   mudarStatus.mockReset().mockResolvedValue({ erro: null })
   reenviar.mockReset().mockResolvedValue({ erro: null })
   salvarPlano.mockReset().mockResolvedValue({ erro: null })
+  verificarAgora.mockReset().mockResolvedValue({ erro: null, resumo: { rotas_verificadas: 2, buscas: 24, alertas_gerados: 3, erros: 0 } })
   leads = [lead({})]
 })
 afterEach(cleanup)
@@ -108,5 +118,24 @@ describe('Admin', () => {
     await userEvent.click(within(form).getByRole('button', { name: 'Salvar' }))
     expect(within(form).getByRole('alert')).toHaveTextContent('números inteiros')
     expect(salvarPlano).toHaveBeenCalledTimes(1)
+  })
+
+  it('mostra o histórico de verificações e roda uma nova sob demanda', async () => {
+    render(<Admin />)
+    await userEvent.click(screen.getByRole('tab', { name: 'Alertas' }))
+    expect(screen.getByText('Automática')).toBeInTheDocument()
+    expect(screen.getByText(/2 rotas, 24 consultas, 1 alertas/)).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Verificar agora' }))
+    expect(verificarAgora).toHaveBeenCalled()
+    expect(await screen.findByText('Verificação concluída: 2 rotas, 3 alertas novos.')).toBeInTheDocument()
+  })
+
+  it('mostra o erro quando a verificação falha', async () => {
+    verificarAgora.mockResolvedValue({ erro: 'Só administradores podem rodar a verificação.' })
+    render(<Admin />)
+    await userEvent.click(screen.getByRole('tab', { name: 'Alertas' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Verificar agora' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('Só administradores')
   })
 })

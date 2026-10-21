@@ -16,6 +16,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      alertas_execucoes: {
+        Row: {
+          alertas_gerados: number
+          buscas: number
+          concluido_em: string | null
+          detalhe: string | null
+          erros: number
+          id: number
+          iniciado_em: string
+          origem: string
+          rotas_verificadas: number
+        }
+        Insert: {
+          alertas_gerados?: number
+          buscas?: number
+          concluido_em?: string | null
+          detalhe?: string | null
+          erros?: number
+          id?: number
+          iniciado_em?: string
+          origem: string
+          rotas_verificadas?: number
+        }
+        Update: {
+          alertas_gerados?: number
+          buscas?: number
+          concluido_em?: string | null
+          detalhe?: string | null
+          erros?: number
+          id?: number
+          iniciado_em?: string
+          origem?: string
+          rotas_verificadas?: number
+        }
+        Relationships: []
+      }
       alertas_enviados: {
         Row: {
           canal: string
