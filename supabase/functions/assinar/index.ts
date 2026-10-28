@@ -4,7 +4,16 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 import { createClient } from 'npm:@supabase/supabase-js@2.118.0'
 
-import { cancelarAssinatura, criarAssinatura, criarCliente, ErroAsaas, faturaEmAberto, type ClienteAsaas } from './asaas.ts'
+import {
+  cancelarAssinatura,
+  criarAssinatura,
+  criarCliente,
+  ErroAsaas,
+  faturaEmAberto,
+  situacaoDasCobrancas,
+  type ClienteAsaas,
+} from './asaas.ts'
+import { pagamentoConfirmado } from './datas.ts'
 import { soDigitos, validarCpfCnpj } from './documento.ts'
 
 const cabecalhosCors = {
@@ -63,7 +72,7 @@ Deno.serve(async (req: Request) => {
   } catch {
     return erro(400, 'pedido_invalido', 'Pedido inválido.')
   }
-  const acao = corpo.acao === 'fatura' ? 'fatura' : 'assinar'
+  const acao = corpo.acao === 'fatura' ? 'fatura' : corpo.acao === 'sincronizar' ? 'sincronizar' : 'assinar'
 
   const { data: perfil } = await db.from('profiles').select('nome, telefone').eq('id', usuario.id).maybeSingle()
   const { data: assinatura } = await db
@@ -73,6 +82,27 @@ Deno.serve(async (req: Request) => {
     .maybeSingle()
 
   try {
+    // Rede de segurança do webhook: pergunta ao Asaas se a assinatura já foi paga e, se foi, ativa agora.
+    // Só vale para assinatura pendente ou inadimplente (a cancelada não volta por aqui).
+    if (acao === 'sincronizar') {
+      const situacao = assinatura?.status ?? null
+      if (!assinatura?.asaas_subscription_id || (situacao !== 'pendente' && situacao !== 'inadimplente')) {
+        return responder({ status: situacao })
+      }
+      const pago = pagamentoConfirmado(await situacaoDasCobrancas(asaas, assinatura.asaas_subscription_id))
+      if (!pago) return responder({ status: situacao })
+      const { error: erroAtivar } = await db
+        .from('subscriptions')
+        .update({ status: 'ativo', proxima_cobranca: pago.proximaCobranca })
+        .eq('user_id', usuario.id)
+      if (erroAtivar) {
+        console.error('falha ao ativar a assinatura', erroAtivar.message)
+        return erro(500, 'erro', 'Não foi possível atualizar sua assinatura agora. Tente de novo em instantes.')
+      }
+      console.log(JSON.stringify({ usuario: usuario.id.slice(0, 8), sincronizada: 'ativo' }))
+      return responder({ status: 'ativo' })
+    }
+
     // Fatura em aberto da assinatura que já existe (pendente ou vencida).
     if (acao === 'fatura') {
       if (!assinatura?.asaas_subscription_id) return erro(404, 'sem_assinatura', 'Você ainda não escolheu um plano.')

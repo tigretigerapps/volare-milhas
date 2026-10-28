@@ -5,6 +5,7 @@ import { CampoTexto } from '@/components/CampoTexto'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/contexts/useAuth'
 import { usePlano } from '@/hooks/usePlano'
+import { useSincronizarAssinatura } from '@/hooks/useSincronizarAssinatura'
 import type { Perfil } from '@/contexts/auth-context'
 import { interpretarMilheiro, milheiroParaCampo } from '@/lib/milheiro'
 
@@ -81,6 +82,7 @@ function FormularioDados({ perfil }: { perfil: Perfil }) {
 export function Conta() {
   const { user, perfil, sair } = useAuth()
   const { plano } = usePlano()
+  useSincronizarAssinatura()
 
   return (
     <div className="mx-auto flex w-full max-w-lg flex-col gap-6">

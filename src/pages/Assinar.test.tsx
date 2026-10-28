@@ -24,6 +24,8 @@ vi.mock('@/hooks/useAssinatura', () => ({
   }),
 }))
 
+vi.mock('@/hooks/useSincronizarAssinatura', () => ({ useSincronizarAssinatura: () => undefined }))
+
 const assign = vi.fn()
 beforeEach(() => {
   status = 'pendente'

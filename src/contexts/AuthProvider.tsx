@@ -65,13 +65,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [userId],
   )
 
+  const recarregarPerfil = useCallback(async () => {
+    if (!userId) return
+    const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle()
+    if (error) console.error('Erro ao recarregar o perfil', error)
+    else setPerfil(data)
+  }, [userId])
+
   const sair = useCallback(async () => {
     await supabase.auth.signOut()
   }, [])
 
   const valor = useMemo<ValorAuth>(
-    () => ({ carregando, session, user: session?.user ?? null, perfil, atualizarPerfil, sair }),
-    [carregando, session, perfil, atualizarPerfil, sair],
+    () => ({ carregando, session, user: session?.user ?? null, perfil, atualizarPerfil, sair, recarregarPerfil }),
+    [carregando, session, perfil, atualizarPerfil, sair, recarregarPerfil],
   )
 
   return <AuthContext.Provider value={valor}>{children}</AuthContext.Provider>

@@ -16,6 +16,8 @@ export type ValorAuth = {
   perfil: Perfil | null
   atualizarPerfil: (alteracao: AlteracaoPerfil) => Promise<{ erro: string | null }>
   sair: () => Promise<void>
+  /** Lê o perfil de novo do banco (por exemplo, depois que a assinatura foi ativada). */
+  recarregarPerfil: () => Promise<void>
 }
 
 export const AuthContext = createContext<ValorAuth | null>(null)

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { cancelarAssinatura, criarAssinatura, criarCliente, ErroAsaas, faturaEmAberto, URL_ASAAS } from './asaas.ts'
+import { cancelarAssinatura, criarAssinatura, criarCliente, ErroAsaas, faturaEmAberto, situacaoDasCobrancas, URL_ASAAS } from './asaas.ts'
+import { pagamentoConfirmado, somarUmMes } from './datas.ts'
 import { validarCpfCnpj } from './documento.ts'
 
 describe('validarCpfCnpj', () => {
@@ -92,5 +93,29 @@ describe('cliente do Asaas', () => {
 
     const { cliente: caido } = simulador({ '/subscriptions/sub_x': { status: 500, corpo: {} } })
     await expect(cancelarAssinatura(caido, 'sub_x')).rejects.toBeInstanceOf(ErroAsaas)
+  })
+
+  it('conta as cobranças em aberto e as pagas', async () => {
+    const { cliente } = simulador({
+      'status=PENDING': { corpo: { data: [] } },
+      'status=OVERDUE': { corpo: { data: [] } },
+      'status=RECEIVED': { corpo: { data: [{ dueDate: '2026-10-28' }] } },
+      'status=CONFIRMED': { corpo: { data: [] } },
+    })
+    expect(await situacaoDasCobrancas(cliente, 'sub_1')).toEqual({ emAberto: 0, pagas: [{ dueDate: '2026-10-28' }] })
+  })
+})
+
+describe('pagamentoConfirmado', () => {
+  it('só confirma quando nada está em aberto e algo foi pago', () => {
+    expect(pagamentoConfirmado({ emAberto: 0, pagas: [{ dueDate: '2026-10-28' }] })).toEqual({ proximaCobranca: '2026-11-28' })
+    expect(pagamentoConfirmado({ emAberto: 1, pagas: [{ dueDate: '2026-10-28' }] })).toBeNull()
+    expect(pagamentoConfirmado({ emAberto: 0, pagas: [] })).toBeNull()
+  })
+  it('usa o vencimento da cobrança paga mais recente', () => {
+    expect(pagamentoConfirmado({ emAberto: 0, pagas: [{ dueDate: '2026-09-30' }, { dueDate: '2026-10-31' }] })).toEqual({ proximaCobranca: '2026-11-30' })
+  })
+  it('soma um mês respeitando o fim do mês', () => {
+    expect(somarUmMes('2026-01-31')).toBe('2026-02-28')
   })
 })

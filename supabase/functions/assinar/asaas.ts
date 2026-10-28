@@ -108,3 +108,18 @@ export async function faturaEmAberto(c: ClienteAsaas, assinaturaId: string): Pro
     .sort((a, b) => a.dueDate.localeCompare(b.dueDate))[0]
   return maisAntiga?.invoiceUrl ?? null
 }
+
+/** Quantas cobranças da assinatura estão em aberto e quais já foram pagas (com a data de vencimento de cada). */
+export async function situacaoDasCobrancas(
+  c: ClienteAsaas,
+  assinaturaId: string,
+): Promise<{ emAberto: number; pagas: { dueDate: string }[] }> {
+  const buscar = async (status: string) => {
+    const r = await chamar(c, 'GET', `/subscriptions/${encodeURIComponent(assinaturaId)}/payments?status=${status}`)
+    return (Array.isArray(r.data) ? r.data : []) as { dueDate: string }[]
+  }
+  const [pendentes, vencidas, recebidas, confirmadas] = await Promise.all(
+    ['PENDING', 'OVERDUE', 'RECEIVED', 'CONFIRMED'].map(buscar),
+  )
+  return { emAberto: pendentes.length + vencidas.length, pagas: [...recebidas, ...confirmadas] }
+}

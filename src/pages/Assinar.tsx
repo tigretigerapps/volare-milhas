@@ -5,6 +5,7 @@ import { CampoTexto } from '@/components/CampoTexto'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/contexts/useAuth'
 import { useAssinatura } from '@/hooks/useAssinatura'
+import { useSincronizarAssinatura } from '@/hooks/useSincronizarAssinatura'
 import { documentoCompleto, formatarCpfCnpj, situacaoAssinatura } from '@/lib/assinatura'
 import { formatarReaisComCentavos } from '@/lib/formato'
 import { cn } from '@/lib/utils'
@@ -15,6 +16,7 @@ const irParaPagamento = (url: string) => window.location.assign(url)
 export function Assinar() {
   const { perfil } = useAuth()
   const { planos, carregando, assinar, abrirFatura } = useAssinatura()
+  useSincronizarAssinatura()
   const [escolhido, setEscolhido] = useState<string | null>(null)
   const [documento, setDocumento] = useState('')
   const [erro, setErro] = useState<string | null>(null)
