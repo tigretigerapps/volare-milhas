@@ -27,7 +27,7 @@ export type ClienteAsaas = { ambiente: Ambiente; chave: string; req?: Requisicao
 // deno-lint-ignore no-explicit-any
 type Corpo = Record<string, any>
 
-async function chamar(c: ClienteAsaas, metodo: 'GET' | 'POST', caminho: string, corpo?: Corpo): Promise<Corpo> {
+async function chamar(c: ClienteAsaas, metodo: 'GET' | 'POST' | 'DELETE', caminho: string, corpo?: Corpo): Promise<Corpo> {
   const resposta = await (c.req ?? fetch)(`${URL_ASAAS[c.ambiente]}${caminho}`, {
     method: metodo,
     headers: {
@@ -84,6 +84,16 @@ export async function criarAssinatura(
   })
   if (typeof r.id !== 'string') throw new ErroAsaas('Asaas não devolveu o id da assinatura', 502, null)
   return r.id
+}
+
+/** Cancela a assinatura no Asaas (para de gerar cobranças). Assinatura que já não existe conta como cancelada. */
+export async function cancelarAssinatura(c: ClienteAsaas, assinaturaId: string): Promise<void> {
+  try {
+    await chamar(c, 'DELETE', `/subscriptions/${encodeURIComponent(assinaturaId)}`)
+  } catch (e) {
+    if (e instanceof ErroAsaas && e.status === 404) return
+    throw e
+  }
 }
 
 /** O link da fatura em aberto mais antiga da assinatura (pendente ou vencida), ou null se não houver. */

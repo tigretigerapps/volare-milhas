@@ -4,7 +4,7 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 import { createClient } from 'npm:@supabase/supabase-js@2.118.0'
 
-import { criarAssinatura, criarCliente, ErroAsaas, faturaEmAberto, type ClienteAsaas } from './asaas.ts'
+import { cancelarAssinatura, criarAssinatura, criarCliente, ErroAsaas, faturaEmAberto, type ClienteAsaas } from './asaas.ts'
 import { soDigitos, validarCpfCnpj } from './documento.ts'
 
 const cabecalhosCors = {
@@ -110,6 +110,9 @@ Deno.serve(async (req: Request) => {
         celular: celular.length >= 10 ? celular : null,
         userId: usuario.id,
       }))
+
+    // Trocou de plano antes de pagar: cancela a assinatura anterior no Asaas, senão as duas continuariam cobrando.
+    if (assinatura?.asaas_subscription_id) await cancelarAssinatura(asaas, assinatura.asaas_subscription_id)
 
     const hoje = hojeSaoPaulo()
     const assinaturaId = await criarAssinatura(asaas, {

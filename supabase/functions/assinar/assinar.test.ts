@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { criarAssinatura, criarCliente, ErroAsaas, faturaEmAberto, URL_ASAAS } from './asaas.ts'
+import { cancelarAssinatura, criarAssinatura, criarCliente, ErroAsaas, faturaEmAberto, URL_ASAAS } from './asaas.ts'
 import { validarCpfCnpj } from './documento.ts'
 
 describe('validarCpfCnpj', () => {
@@ -78,5 +78,19 @@ describe('cliente do Asaas', () => {
       descricao: 'O CPF/CNPJ informado é inválido.',
     })
     await expect(criarCliente(cliente, { nome: 'A', cpfCnpj: '1', email: null, celular: null, userId: 'u' })).rejects.toBeInstanceOf(ErroAsaas)
+  })
+
+  it('cancela a assinatura anterior com DELETE e aceita uma que já não existe', async () => {
+    const { chamadas, cliente } = simulador({ '/subscriptions/sub_velha': { corpo: { deleted: true, id: 'sub_velha' } } })
+    await cancelarAssinatura(cliente, 'sub_velha')
+    expect(chamadas[0].init.method).toBe('DELETE')
+    expect(chamadas[0].url).toBe(`${URL_ASAAS.sandbox}/subscriptions/sub_velha`)
+    expect(chamadas[0].init.body).toBeUndefined()
+
+    const { cliente: semAssinatura } = simulador({ '/subscriptions/sub_sumiu': { status: 404, corpo: {} } })
+    await expect(cancelarAssinatura(semAssinatura, 'sub_sumiu')).resolves.toBeUndefined()
+
+    const { cliente: caido } = simulador({ '/subscriptions/sub_x': { status: 500, corpo: {} } })
+    await expect(cancelarAssinatura(caido, 'sub_x')).rejects.toBeInstanceOf(ErroAsaas)
   })
 })
