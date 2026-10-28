@@ -135,6 +135,11 @@ Deno.serve(async (req: Request) => {
     if (assinatura?.status === 'ativo' && !reativando) {
       return erro(409, 'ja_assinante', 'Sua assinatura já está ativa. Para trocar de plano, fale com a equipe da Volare.')
     }
+    // Reativar mantém o acesso que já existe: só vale para o plano que o assinante já tem. Trocar de plano
+    // aqui daria o plano novo (mais caro) antes do pagamento.
+    if (reativando && plano !== assinatura?.plano) {
+      return erro(409, 'troca_de_plano', 'Para trocar de plano, fale com a equipe da Volare.')
+    }
 
     // Já escolheu um plano antes e não pagou: reaproveita a assinatura e a fatura em aberto, sem cobrar em duplicidade.
     if (!reativando && assinatura?.asaas_subscription_id && assinatura.plano === plano && assinatura.status !== 'cancelado') {
