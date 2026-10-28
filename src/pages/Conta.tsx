@@ -5,7 +5,9 @@ import { CampoTexto } from '@/components/CampoTexto'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/contexts/useAuth'
 import { usePlano } from '@/hooks/usePlano'
+import { useMinhaAssinatura } from '@/hooks/useMinhaAssinatura'
 import { useSincronizarAssinatura } from '@/hooks/useSincronizarAssinatura'
+import { dataBR, situacaoDaAssinatura } from '@/lib/cancelamento'
 import type { Perfil } from '@/contexts/auth-context'
 import { interpretarMilheiro, milheiroParaCampo } from '@/lib/milheiro'
 
@@ -79,6 +81,76 @@ function FormularioDados({ perfil }: { perfil: Perfil }) {
   )
 }
 
+function GerenciarAssinatura({ plano }: { plano: string }) {
+  const { assinatura, cancelar, reativar } = useMinhaAssinatura()
+  const [confirmando, setConfirmando] = useState(false)
+  const [trabalhando, setTrabalhando] = useState(false)
+  const [erro, setErro] = useState<string | null>(null)
+  const situacao = situacaoDaAssinatura(assinatura)
+
+  const executar = async (acao: () => Promise<{ erro: string | null; faturaUrl?: string | null }>) => {
+    setTrabalhando(true)
+    setErro(null)
+    const resultado = await acao()
+    setTrabalhando(false)
+    setConfirmando(false)
+    setErro(resultado.erro)
+    // Reativar abre a fatura do período seguinte, se o Asaas já a gerou.
+    if (!resultado.erro && resultado.faturaUrl) window.location.assign(resultado.faturaUrl)
+  }
+
+  if (situacao.tipo === 'outra') return null
+
+  return (
+    <div className="mt-3 flex flex-col gap-2 text-sm">
+      {situacao.tipo === 'ativa' && (
+        <>
+          {situacao.renovaEm && <p className="text-texto-secundario">Renova em {dataBR(situacao.renovaEm)}.</p>}
+          {confirmando ? (
+            <div role="alertdialog" aria-label="Confirmar cancelamento" className="flex flex-col gap-2 rounded-md border border-fio bg-superficie p-3">
+              <p className="text-texto">
+                Cancelar a assinatura?
+                {situacao.renovaEm
+                  ? ` Você continua com acesso até ${dataBR(situacao.renovaEm)} e não será cobrado de novo.`
+                  : ' Você não será cobrado de novo.'}
+              </p>
+              <div className="flex gap-2">
+                <Button size="sm" onClick={() => void executar(cancelar)} disabled={trabalhando}>
+                  {trabalhando ? 'Cancelando…' : 'Sim, cancelar'}
+                </Button>
+                <Button size="sm" variant="contorno" onClick={() => setConfirmando(false)} disabled={trabalhando}>
+                  Manter assinatura
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <Button size="sm" variant="contorno" onClick={() => setConfirmando(true)}>
+                Cancelar assinatura
+              </Button>
+            </div>
+          )}
+        </>
+      )}
+      {situacao.tipo === 'cancelada' && (
+        <>
+          <p className="text-texto">Assinatura cancelada. Seu acesso vai até {dataBR(situacao.acessoAte)}.</p>
+          <div>
+            <Button size="sm" variant="contorno" onClick={() => void executar(() => reativar(plano))} disabled={trabalhando}>
+              {trabalhando ? 'Reativando…' : 'Reativar assinatura'}
+            </Button>
+          </div>
+        </>
+      )}
+      {erro && (
+        <p role="alert" className="text-texto">
+          {erro}
+        </p>
+      )}
+    </div>
+  )
+}
+
 export function Conta() {
   const { user, perfil, sair } = useAuth()
   const { plano } = usePlano()
@@ -112,6 +184,9 @@ export function Conta() {
             <Button asChild size="sm" className="mt-3">
               <Link to="/assinar">{perfil.status_assinatura === 'inadimplente' ? 'Regularizar pagamento' : 'Escolher um plano'}</Link>
             </Button>
+          )}
+          {perfil.status_assinatura === 'ativo' && perfil.plano && perfil.papel !== 'admin' && (
+            <GerenciarAssinatura plano={perfil.plano} />
           )}
           {plano && perfil.status_assinatura === 'ativo' && (
             <p className="text-sm text-texto-secundario">

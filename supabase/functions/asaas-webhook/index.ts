@@ -5,7 +5,10 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 import { createClient } from 'npm:@supabase/supabase-js@2.118.0'
 
-import { efeitoDoEvento, situacaoFinal, type EventoAsaas } from './eventos.ts'
+import { decidirCancelamento, efeitoDoEvento, situacaoFinal, type EventoAsaas } from './eventos.ts'
+
+const hojeSaoPaulo = () =>
+  new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date())
 
 function responder(corpo: Record<string, unknown>, status = 200): Response {
   return new Response(JSON.stringify(corpo), { status, headers: { 'Content-Type': 'application/json' } })
@@ -66,7 +69,7 @@ Deno.serve(async (req: Request) => {
 
     const { data: assinatura, error: erroBusca } = await db
       .from('subscriptions')
-      .select('id, status')
+      .select('id, status, proxima_cobranca, acesso_ate')
       .eq('asaas_subscription_id', efeito.assinaturaId)
       .maybeSingle()
     if (erroBusca) throw erroBusca
@@ -76,11 +79,21 @@ Deno.serve(async (req: Request) => {
       return responder({ ok: true, ignorado: true })
     }
 
-    const situacao = situacaoFinal(assinatura.status, efeito.situacao)
-    const { error: erroAtualizar } = await db
-      .from('subscriptions')
-      .update({ status: situacao, ...(efeito.proximaCobranca ? { proxima_cobranca: efeito.proximaCobranca } : {}) })
-      .eq('id', assinatura.id)
+    let mudanca: Record<string, unknown>
+    let situacao: string
+    if (efeito.situacao === 'cancelado') {
+      // Quem já pagou o período mantém o acesso até o fim dele; o gatilho diário do banco encerra depois.
+      const decisao = decidirCancelamento(
+        { status: assinatura.status, proximaCobranca: assinatura.proxima_cobranca, acessoAte: assinatura.acesso_ate },
+        hojeSaoPaulo(),
+      )
+      situacao = decisao.status
+      mudanca = { status: decisao.status, acesso_ate: decisao.acessoAte }
+    } else {
+      situacao = situacaoFinal(assinatura.status, efeito.situacao)
+      mudanca = { status: situacao, ...(efeito.proximaCobranca ? { proxima_cobranca: efeito.proximaCobranca } : {}) }
+    }
+    const { error: erroAtualizar } = await db.from('subscriptions').update(mudanca).eq('id', assinatura.id)
     if (erroAtualizar) throw erroAtualizar
 
     console.log(JSON.stringify({ evento: evento.event, de: assinatura.status, para: situacao }))

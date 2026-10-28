@@ -56,3 +56,27 @@ export function efeitoDoEvento(e: EventoAsaas): Efeito | null {
 export function situacaoFinal(atual: string, nova: Situacao): Situacao {
   return atual === 'cancelado' && nova === 'inadimplente' ? 'cancelado' : nova
 }
+
+export type EstadoAssinatura = {
+  status: string
+  proximaCobranca: string | null
+  acessoAte: string | null
+}
+
+export type DecisaoCancelamento = { status: 'ativo' | 'cancelado'; acessoAte: string | null }
+
+/**
+ * Cancelamento (feito pelo assinante ou direto no painel do Asaas): quem já pagou o período mantém o acesso
+ * até o fim dele; o cancelamento só vale na hora para quem não tem período pago pela frente.
+ * `hoje` no formato "AAAA-MM-DD".
+ */
+export function decidirCancelamento(atual: EstadoAssinatura, hoje: string): DecisaoCancelamento {
+  if (atual.acessoAte) {
+    // Já estava agendado: não antecipa nem adia.
+    return atual.acessoAte >= hoje ? { status: 'ativo', acessoAte: atual.acessoAte } : { status: 'cancelado', acessoAte: atual.acessoAte }
+  }
+  if (atual.status === 'ativo' && atual.proximaCobranca && atual.proximaCobranca >= hoje) {
+    return { status: 'ativo', acessoAte: atual.proximaCobranca }
+  }
+  return { status: 'cancelado', acessoAte: null }
+}

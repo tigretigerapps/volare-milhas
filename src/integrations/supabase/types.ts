@@ -461,6 +461,7 @@ export type Database = {
       }
       subscriptions: {
         Row: {
+          acesso_ate: string | null
           asaas_customer_id: string | null
           asaas_subscription_id: string | null
           created_at: string
@@ -473,6 +474,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          acesso_ate?: string | null
           asaas_customer_id?: string | null
           asaas_subscription_id?: string | null
           created_at?: string
@@ -485,6 +487,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          acesso_ate?: string | null
           asaas_customer_id?: string | null
           asaas_subscription_id?: string | null
           created_at?: string

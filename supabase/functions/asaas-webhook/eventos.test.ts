@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { efeitoDoEvento, situacaoFinal, somarUmMes } from './eventos.ts'
+import { decidirCancelamento, efeitoDoEvento, situacaoFinal, somarUmMes } from './eventos.ts'
 
 const pagamento = (event: string, extra: Record<string, unknown> = {}) => ({
   id: 'evt_1',
@@ -53,5 +53,30 @@ describe('situacaoFinal', () => {
     expect(situacaoFinal('cancelado', 'ativo')).toBe('ativo')
     expect(situacaoFinal('ativo', 'inadimplente')).toBe('inadimplente')
     expect(situacaoFinal('pendente', 'ativo')).toBe('ativo')
+  })
+})
+
+describe('decidirCancelamento', () => {
+  const hoje = '2026-11-10'
+  it('quem pagou o período mantém o acesso até a próxima cobrança', () => {
+    expect(decidirCancelamento({ status: 'ativo', proximaCobranca: '2026-11-28', acessoAte: null }, hoje)).toEqual({
+      status: 'ativo',
+      acessoAte: '2026-11-28',
+    })
+  })
+  it('sem período pago pela frente, cancela na hora', () => {
+    expect(decidirCancelamento({ status: 'pendente', proximaCobranca: '2026-11-10', acessoAte: null }, hoje)).toEqual({ status: 'cancelado', acessoAte: null })
+    expect(decidirCancelamento({ status: 'ativo', proximaCobranca: '2026-11-01', acessoAte: null }, hoje)).toEqual({ status: 'cancelado', acessoAte: null })
+    expect(decidirCancelamento({ status: 'inadimplente', proximaCobranca: '2026-12-01', acessoAte: null }, hoje)).toEqual({ status: 'cancelado', acessoAte: null })
+  })
+  it('cancelamento já agendado não muda de data', () => {
+    expect(decidirCancelamento({ status: 'ativo', proximaCobranca: '2026-12-28', acessoAte: '2026-11-28' }, hoje)).toEqual({
+      status: 'ativo',
+      acessoAte: '2026-11-28',
+    })
+    expect(decidirCancelamento({ status: 'ativo', proximaCobranca: '2026-11-01', acessoAte: '2026-11-05' }, hoje)).toEqual({
+      status: 'cancelado',
+      acessoAte: '2026-11-05',
+    })
   })
 })

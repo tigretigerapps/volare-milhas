@@ -132,7 +132,10 @@ function LinhaAssinante({ a }: { a: AssinanteAdmin }) {
         <p className="text-texto-secundario">{a.telefone ?? 'Sem telefone'}</p>
       </div>
       <p className="text-texto">Plano {a.plano ?? 'nenhum'}</p>
-      <p className="text-texto">{status}</p>
+      <p className="text-texto">
+        {status}
+        {a.assinatura?.acesso_ate && <span className="block text-texto-secundario">Cancelada, acesso até {a.assinatura.acesso_ate.split('-').reverse().join('/')}</span>}
+      </p>
       <p className="tabular-nums text-texto-secundario">{proxima ? `Próxima cobrança ${proxima}` : 'Sem cobrança agendada'}</p>
     </li>
   )
