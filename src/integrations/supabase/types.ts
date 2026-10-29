@@ -459,6 +459,33 @@ export type Database = {
           },
         ]
       }
+      telegram_vinculos: {
+        Row: {
+          chat_id: number | null
+          codigo: string | null
+          created_at: string
+          expira_em: string | null
+          user_id: string
+          vinculado_em: string | null
+        }
+        Insert: {
+          chat_id?: number | null
+          codigo?: string | null
+          created_at?: string
+          expira_em?: string | null
+          user_id: string
+          vinculado_em?: string | null
+        }
+        Update: {
+          chat_id?: number | null
+          codigo?: string | null
+          created_at?: string
+          expira_em?: string | null
+          user_id?: string
+          vinculado_em?: string | null
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           acesso_ate: string | null

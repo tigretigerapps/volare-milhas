@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/useAuth'
 import { usePlano } from '@/hooks/usePlano'
 import { useMinhaAssinatura } from '@/hooks/useMinhaAssinatura'
 import { useSincronizarAssinatura } from '@/hooks/useSincronizarAssinatura'
+import { useTelegram } from '@/hooks/useTelegram'
 import { dataBR, situacaoDaAssinatura } from '@/lib/cancelamento'
 import type { Perfil } from '@/contexts/auth-context'
 import { interpretarMilheiro, milheiroParaCampo } from '@/lib/milheiro'
@@ -78,6 +79,70 @@ function FormularioDados({ perfil }: { perfil: Perfil }) {
         )}
       </div>
     </form>
+  )
+}
+
+function AlertasTelegram() {
+  const { conectado, carregando, conectar, desconectar } = useTelegram()
+  const [trabalhando, setTrabalhando] = useState(false)
+  const [erro, setErro] = useState<string | null>(null)
+  const [aberto, setAberto] = useState(false)
+
+  const abrirTelegram = async () => {
+    setTrabalhando(true)
+    setErro(null)
+    const { erro: falha, url } = await conectar()
+    setTrabalhando(false)
+    if (falha || !url) {
+      setErro(falha)
+      return
+    }
+    setAberto(true)
+    window.open(url, '_blank', 'noopener')
+  }
+
+  const sair = async () => {
+    setTrabalhando(true)
+    setErro((await desconectar()).erro)
+    setTrabalhando(false)
+    setAberto(false)
+  }
+
+  return (
+    <section aria-labelledby="titulo-telegram" className="border-t border-fio pt-5">
+      <h2 id="titulo-telegram" className="font-normal">
+        Alertas no Telegram
+      </h2>
+      {carregando ? (
+        <p className="mt-1 text-sm text-texto-secundario">Carregando…</p>
+      ) : conectado ? (
+        <>
+          <p className="mt-1 text-sm text-texto-secundario">Telegram conectado. Você recebe aqui os alertas de preço das suas rotas.</p>
+          <Button size="sm" variant="contorno" className="mt-3" onClick={() => void sair()} disabled={trabalhando}>
+            {trabalhando ? 'Desconectando…' : 'Desconectar'}
+          </Button>
+        </>
+      ) : (
+        <>
+          <p className="mt-1 text-sm text-texto-secundario">
+            Receba no Telegram o aviso quando um preço bater a meta de uma rota.
+          </p>
+          <Button size="sm" className="mt-3" onClick={() => void abrirTelegram()} disabled={trabalhando}>
+            {trabalhando ? 'Abrindo…' : 'Conectar Telegram'}
+          </Button>
+          {aberto && (
+            <p role="status" className="mt-2 text-sm text-texto-secundario">
+              No Telegram, toque em Iniciar e depois volte a esta página. O link vale por 15 minutos.
+            </p>
+          )}
+        </>
+      )}
+      {erro && (
+        <p role="alert" className="mt-2 text-sm text-texto">
+          {erro}
+        </p>
+      )}
+    </section>
   )
 }
 
@@ -195,6 +260,8 @@ export function Conta() {
           )}
         </section>
       )}
+
+      <AlertasTelegram />
 
       <div className="border-t border-fio pt-5">
         <Button variant="contorno" onClick={() => void sair()}>

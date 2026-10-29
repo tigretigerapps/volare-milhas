@@ -14,6 +14,7 @@ import {
   type RotaAlerta,
 } from './alertas.ts'
 import { avaliarDestinos } from './cota.ts'
+import { enviarMensagem, mensagemDeAlerta } from './telegram.ts'
 import { hojeSaoPaulo, inicioDoDiaSaoPaulo } from './datas.ts'
 import { fonteMock, fonteReal, type Fonte } from './fonte.ts'
 import type { Obj, PedidoCompanhia } from './tipos.ts'
@@ -135,6 +136,15 @@ async function verificarAlertas(db: any, origem: 'agendador' | 'manual'): Promis
         .map((p) => p.id),
     )
 
+    // Quem conectou o Telegram também recebe o alerta por lá (se o bot estiver configurado).
+    const tokenDoBot = Deno.env.get('TELEGRAM_BOT_TOKEN') ?? ''
+    const siteUrl = Deno.env.get('SITE_URL') ?? 'https://volare-milhas.rafael-961.workers.dev'
+    const chats = new Map<string, number>()
+    if (tokenDoBot && donos.length > 0) {
+      const { data: vinculos } = await db.from('telegram_vinculos').select('user_id, chat_id').in('user_id', donos).not('chat_id', 'is', null)
+      for (const v of (vinculos ?? []) as { user_id: string; chat_id: number }[]) chats.set(v.user_id, v.chat_id)
+    }
+
     for (const rota of (rotas ?? []) as RotaAlerta[]) {
       if (!elegiveis.has(rota.user_id) || rota.companhias.length === 0) continue
       const datas = datasAmostra(rota.data_inicio, rota.data_fim, hoje)
@@ -193,6 +203,32 @@ async function verificarAlertas(db: any, origem: 'agendador' | 'manual'): Promis
         resumo.erros++
       } else if (!erroAlerta) {
         resumo.alertas_gerados++
+        const chatId = chats.get(rota.user_id)
+        if (chatId && tokenDoBot) {
+          try {
+            const envio = await enviarMensagem(tokenDoBot, chatId, mensagemDeAlerta(rota, acerto, siteUrl))
+            if (envio.ok) {
+              // Registra também o canal telegram (a mesma oferta, outro canal; o site junta os dois num alerta só).
+              await db.from('alertas_enviados').insert({
+                user_id: rota.user_id,
+                rota_id: rota.id,
+                oferta_chave: chaveDaOferta(rota.id, acerto),
+                oferta: ofertaDoAlerta(acerto),
+                canal: 'telegram',
+              })
+            } else if (envio.bloqueado) {
+              // O usuário bloqueou o bot: para de tentar até ele conectar de novo.
+              await db.from('telegram_vinculos').delete().eq('user_id', rota.user_id)
+              console.log(JSON.stringify({ telegram: 'desvinculado', usuario: rota.user_id.slice(0, 8), http: envio.status }))
+            } else {
+              console.error('falha ao enviar pelo Telegram', envio.status)
+              resumo.erros++
+            }
+          } catch (e) {
+            console.error('falha ao enviar pelo Telegram', e instanceof Error ? e.message : JSON.stringify(e))
+            resumo.erros++
+          }
+        }
       }
     }
   } catch (e) {
