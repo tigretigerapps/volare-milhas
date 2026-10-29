@@ -30,3 +30,21 @@ export async function consultar(
   }
   return { status: resposta.status, corpo }
 }
+
+/**
+ * Remove a penalização da fila de um webhook (POST /webhooks/{id}/removeBackoff): o Asaas reenvia na hora os
+ * avisos que estavam esperando o próximo intervalo. É a única escrita deste arquivo. Devolve true no HTTP 204.
+ */
+export async function removerPenalizacao(
+  ambiente: Ambiente,
+  chave: string,
+  webhookId: string,
+  req: typeof fetch = fetch,
+): Promise<{ ok: boolean; status: number }> {
+  const resposta = await req(`${URL_ASAAS[ambiente]}/webhooks/${encodeURIComponent(webhookId)}/removeBackoff`, {
+    method: 'POST',
+    headers: { access_token: chave, Accept: 'application/json', 'User-Agent': 'volare-milhas' },
+    signal: AbortSignal.timeout(20_000),
+  })
+  return { ok: resposta.status === 204 || resposta.status === 200, status: resposta.status }
+}

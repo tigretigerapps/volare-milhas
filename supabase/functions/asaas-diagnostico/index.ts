@@ -1,10 +1,11 @@
-// Diagnóstico do Asaas, SÓ LEITURA: mostra o estado das assinaturas no Asaas ao lado do que temos no banco e a
+// Diagnóstico do Asaas: mostra o estado das assinaturas no Asaas ao lado do que temos no banco e a
 // configuração do webhook. Serve para achar divergências sem abrir o painel do Asaas.
-// Quem chama prova quem é com o segredo do agendador (Vault); a chave do Asaas nunca sai do servidor.
+// É só leitura, exceto a ação explícita { "acao": "remover_penalizacao" }, que pede ao Asaas para reenviar os avisos
+// parados do nosso webhook. Quem chama prova quem é com o segredo do agendador (Vault); a chave do Asaas nunca sai do servidor.
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 import { createClient } from 'npm:@supabase/supabase-js@2.118.0'
 
-import { consultar, type Ambiente } from './cliente.ts'
+import { consultar, removerPenalizacao, type Ambiente } from './cliente.ts'
 import { divergencia, resumirCobranca, resumirWebhook } from './resumo.ts'
 
 function responder(corpo: Record<string, unknown>, status = 200): Response {
@@ -35,8 +36,27 @@ Deno.serve(async (req: Request) => {
   if (!chave) return responder({ erro: 'ASAAS_API_KEY não configurada.' }, 503)
   const ambiente: Ambiente = Deno.env.get('ASAAS_AMBIENTE') === 'producao' ? 'producao' : 'sandbox'
 
+  let corpoPedido: Record<string, unknown> = {}
+  try {
+    const lido = await req.json()
+    if (typeof lido === 'object' && lido !== null) corpoPedido = lido
+  } catch {
+    // sem corpo: é só o diagnóstico
+  }
+
   try {
     const webhooks = await consultar(ambiente, chave, '/webhooks?limit=20')
+
+    // Ação opcional: só nos webhooks que apontam para o nosso endpoint.
+    if (corpoPedido.acao === 'remover_penalizacao') {
+      const nossos = (Array.isArray(webhooks.corpo.data) ? webhooks.corpo.data : []).filter(
+        (w: { id?: unknown; url?: unknown }) => typeof w.id === 'string' && String(w.url ?? '').includes('/functions/v1/asaas-webhook'),
+      )
+      const resultados = []
+      for (const w of nossos) resultados.push({ nome: w.name ?? null, ...(await removerPenalizacao(ambiente, chave, w.id)) })
+      return responder({ ambiente, penalizacaoRemovida: resultados })
+    }
+
     const { data: linhas, error } = await db
       .from('subscriptions')
       .select('user_id, plano, status, acesso_ate, proxima_cobranca, asaas_subscription_id')
