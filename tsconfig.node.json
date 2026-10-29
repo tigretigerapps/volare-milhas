@@ -19,6 +19,6 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["vite.config.ts", "tailwind.config.ts", "supabase/functions/buscar-voos/**/*.ts", "supabase/functions/criar-lead/**/*.ts", "supabase/functions/assinar/**/*.ts", "supabase/functions/asaas-webhook/**/*.ts"],
-  "exclude": ["supabase/functions/buscar-voos/index.ts", "supabase/functions/criar-lead/index.ts", "supabase/functions/assinar/index.ts", "supabase/functions/asaas-webhook/index.ts"]
+  "include": ["vite.config.ts", "tailwind.config.ts", "supabase/functions/buscar-voos/**/*.ts", "supabase/functions/criar-lead/**/*.ts", "supabase/functions/assinar/**/*.ts", "supabase/functions/asaas-webhook/**/*.ts", "supabase/functions/asaas-diagnostico/**/*.ts"],
+  "exclude": ["supabase/functions/buscar-voos/index.ts", "supabase/functions/criar-lead/index.ts", "supabase/functions/assinar/index.ts", "supabase/functions/asaas-webhook/index.ts", "supabase/functions/asaas-diagnostico/index.ts"]
 }
