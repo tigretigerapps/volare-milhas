@@ -1,0 +1,17 @@
+-- Agendamentos do pg_cron (aplicados à parte, com a chave anon pública do projeto no lugar de <CHAVE_ANON>).
+-- Todos chamam Edge Functions com o segredo 'alertas_cron' do Vault no header x-cron-secret.
+--
+-- verificar-alertas-diario   0 11 * * *   (08:00 em São Paulo)   função buscar-voos, corpo {"acao":"verificar_alertas"}
+-- encerrar-assinaturas-canceladas  30 3 * * *  SQL direto: encerra o acesso das assinaturas canceladas cujo período pago acabou
+-- conciliar-asaas-diario     0 9 * * *    (06:00 em São Paulo)   função asaas-conciliar, corrige o que o webhook não avisou
+--
+-- select cron.schedule('conciliar-asaas-diario', '0 9 * * *', $job$
+--   select net.http_post(
+--     url := 'https://okhldqmyweioegpmxlbw.supabase.co/functions/v1/asaas-conciliar',
+--     headers := jsonb_build_object(
+--       'Content-Type', 'application/json',
+--       'Authorization', 'Bearer <CHAVE_ANON>',
+--       'x-cron-secret', (select decrypted_secret from vault.decrypted_secrets where name = 'alertas_cron')),
+--     body := '{}'::jsonb,
+--     timeout_milliseconds := 120000)
+-- $job$);
