@@ -13,7 +13,9 @@ import { Conta } from '@/pages/Conta'
 import { Entrar } from '@/pages/Entrar'
 import { EsqueciSenha } from '@/pages/EsqueciSenha'
 import { NovaSenha } from '@/pages/NovaSenha'
+import { Privacidade } from '@/pages/Privacidade'
 import { Rotas } from '@/pages/Rotas'
+import { Termos } from '@/pages/Termos'
 
 export default function App() {
   return (
@@ -26,6 +28,8 @@ export default function App() {
               <Route path="buscar" element={<Buscar />} />
               <Route path="entrar" element={<Entrar />} />
               <Route path="cadastro" element={<Cadastro />} />
+              <Route path="termos" element={<Termos />} />
+              <Route path="privacidade" element={<Privacidade />} />
               <Route path="esqueci-senha" element={<EsqueciSenha />} />
               <Route path="nova-senha" element={<NovaSenha />} />
               <Route

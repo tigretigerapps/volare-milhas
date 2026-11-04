@@ -21,6 +21,7 @@ export function Cadastro() {
   const [senha, setSenha] = useState('')
   const [erro, setErro] = useState<string | null>(null)
   const [enviando, setEnviando] = useState(false)
+  const [aceitou, setAceitou] = useState(false)
   const [confirmarEmail, setConfirmarEmail] = useState<string | null>(null)
 
   if (session) return <Navigate to="/conta" replace />
@@ -46,6 +47,10 @@ export function Cadastro() {
       setErro('Preencha nome, e-mail e senha.')
       return
     }
+    if (!aceitou) {
+      setErro('Para criar a conta, aceite os Termos de uso e a Política de privacidade.')
+      return
+    }
     if (senha.length < senhaMinima) {
       setErro(`A senha precisa ter pelo menos ${senhaMinima} caracteres.`)
       return
@@ -57,7 +62,7 @@ export function Cadastro() {
       password: senha,
       options: {
         // O trigger do banco copia nome e telefone daqui para public.profiles.
-        data: { nome: nome.trim(), telefone: telefone.trim() || null },
+        data: { nome: nome.trim(), telefone: telefone.trim() || null, termos_aceitos_em: new Date().toISOString() },
         emailRedirectTo: `${window.location.origin}/conta`,
       },
     })
@@ -126,6 +131,25 @@ export function Cadastro() {
         onChange={(e) => setSenha(e.target.value)}
         required
       />
+      <label className="flex items-start gap-2 text-sm text-texto-secundario">
+        <input
+          type="checkbox"
+          checked={aceitou}
+          onChange={(e) => setAceitou(e.target.checked)}
+          className="mt-1 h-4 w-4 shrink-0 accent-primario"
+        />
+        <span>
+          Li e aceito os{' '}
+          <Link to="/termos" target="_blank" className="text-texto underline underline-offset-4 decoration-fio hover:decoration-texto">
+            Termos de uso
+          </Link>{' '}
+          e a{' '}
+          <Link to="/privacidade" target="_blank" className="text-texto underline underline-offset-4 decoration-fio hover:decoration-texto">
+            Política de privacidade
+          </Link>
+          .
+        </span>
+      </label>
       <Button type="submit" disabled={enviando}>
         {enviando ? 'Criando conta…' : 'Criar conta'}
       </Button>
