@@ -29,4 +29,5 @@ dist-ssr
 !.env.example
 
 # Documentos do projeto (contrato com dados pessoais, escopo, custos): só no computador
-Docs/
+Docs/*
+!Docs/design/

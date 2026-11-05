@@ -1,0 +1,87 @@
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Hanken+Grotesk:wght@300;400;500;600&display=swap');
+/* Volo Milhas — classes de componente. Todas as cores, espaços e raios vêm de tokens.css. */
+.vm{font-family:var(--font-sans);color:var(--navy-700);-webkit-font-smoothing:antialiased}
+.vm *{box-sizing:border-box}
+.vm-num{font-variant-numeric:tabular-nums}
+.vm-nw{white-space:nowrap}
+
+/* Barra superior */
+.vm-topbar{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:var(--space-6);height:96px;padding:0 var(--space-10);background:var(--navy-900);color:#FFFFFF}
+.vm-topbar__logo{height:56px;justify-self:center;width:auto;display:block}
+.vm-topbar__nav{display:flex;gap:24px;align-items:center}
+.vm-topbar__link{font-size:15px;font-weight:500;color:#FFFFFF;opacity:.78;text-decoration:none;padding:36px 0 34px;border-bottom:2px solid transparent}
+.vm-topbar__link--ativo{opacity:1;border-bottom-color:var(--gold-500)}
+.vm-badge{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;margin-left:6px;border-radius:var(--radius-pill);background:var(--burgundy-600);color:#FFFFFF;font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}
+.vm-topbar__conta{justify-self:end;font-size:15px;font-weight:500;color:#FFFFFF;opacity:.78}
+
+/* Botões */
+.vm-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:44px;padding:0 20px;border-radius:var(--radius-sm);font-family:var(--font-sans);font-size:15px;font-weight:600;cursor:pointer;border:1.5px solid var(--navy-700);transition:background .15s,color .15s}
+.vm-btn--primario{background:var(--navy-700);color:#FFFFFF}
+.vm-btn--primario:hover,.vm-btn--primario.is-hover{background:var(--navy-900);border-color:var(--navy-900)}
+.vm-btn--contorno{background:var(--surface-card);color:var(--navy-700);height:38px;padding:0 14px;font-size:14px}
+.vm-btn--contorno:hover,.vm-btn--contorno.is-hover{background:var(--navy-700);color:#FFFFFF}
+.vm-btn:focus-visible,.vm-btn.is-focus{outline:2px solid var(--navy-700);outline-offset:2px}
+.vm-link{font-size:14px;font-weight:500;color:var(--gold-700);text-decoration:underline;text-underline-offset:3px}
+
+/* Campos */
+.vm-campo{display:flex;flex-direction:column;gap:var(--space-2);min-width:0}
+.vm-campo__rotulo{font-size:13px;line-height:16px;font-weight:500;color:var(--ink-muted)}
+.vm-campo__input{height:48px;padding:0 var(--space-4);border:1px solid var(--border-control);border-radius:var(--radius-sm);background:var(--surface-card);font-family:var(--font-sans);font-size:16px;color:var(--navy-700);width:100%}
+.vm-campo__input::placeholder{color:var(--ink-muted)}
+.vm-campo__input--iata{font-size:18px;font-weight:600;letter-spacing:.02em}
+.vm-campo__input:focus,.vm-campo__input.is-focus{outline:none;border-color:var(--navy-700);box-shadow:0 0 0 1px var(--navy-700)}
+.vm-campo--erro .vm-campo__input{border-color:var(--burgundy-600)}
+.vm-campo__ajuda{font-size:13px;line-height:18px;color:var(--ink-muted)}
+.vm-campo--erro .vm-campo__ajuda{color:var(--burgundy-600)}
+
+/* Buscador */
+.vm-buscador{background:var(--surface-card);border-radius:var(--radius-md);padding:var(--space-6);display:flex;flex-direction:column;gap:var(--space-4)}
+.vm-buscador__campos{display:grid;grid-template-columns:repeat(4,minmax(0,1fr)) auto;gap:12px;align-items:end}
+.vm-buscador__milheiro{font-size:14px;color:var(--ink-muted)}
+.vm-buscador__milheiro strong{color:var(--navy-700);font-weight:600}
+
+/* Linha de resultado + régua */
+.vm-linha{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.5fr) minmax(0,1.1fr);gap:var(--space-6);align-items:center;padding:var(--space-6);background:var(--surface-card);border-top:1px solid var(--line)}
+.vm-linha__hora{font-size:28px;line-height:32px;font-weight:300;letter-spacing:-.01em;font-variant-numeric:tabular-nums;margin:0}
+.vm-linha__hora span{color:var(--bar-dinheiro)}
+.vm-linha__det{font-size:14px;line-height:20px;color:var(--ink-muted);margin:4px 0 0}
+.vm-regua{display:flex;flex-direction:column;gap:var(--space-2)}
+.vm-regua__linha{display:flex;align-items:center;gap:var(--space-2)}
+.vm-regua__barra{height:10px;border-radius:2px;flex:none;transform-origin:left;animation:vm-cresce .3s ease-out both}
+.vm-regua__barra--dinheiro{background:var(--bar-dinheiro)}
+.vm-regua__barra--milhas{background:var(--gold-500)}
+.vm-regua__barra--fraca{opacity:.4}
+.vm-regua__valor{font-size:13px;color:var(--ink-muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+@keyframes vm-cresce{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@media (prefers-reduced-motion:reduce){.vm-regua__barra{animation:none}}
+.vm-veredito{font-size:20px;line-height:26px;font-weight:600;margin:0;font-variant-numeric:tabular-nums}
+.vm-veredito--milhas{color:var(--gold-700)}
+.vm-veredito--dinheiro{color:var(--navy-700)}
+.vm-veredito__sub{font-size:13px;color:var(--ink-muted);margin:2px 0 12px}
+
+/* Faixa de alerta */
+.vm-alerta{display:flex;align-items:center;gap:12px;padding:14px var(--space-6);background:var(--surface-card);border-top:1px solid var(--line);font-size:14px}
+.vm-alerta__ponto{width:8px;height:8px;border-radius:var(--radius-pill);background:var(--burgundy-600);flex:none}
+.vm-alerta__texto{flex:1;margin:0}
+.vm-alerta__texto strong{font-weight:600}
+.vm-alerta__texto span{color:var(--ink-muted)}
+
+/* Foto (banco de imagens; placeholder até a curadoria) */
+.vm-foto{position:relative;background:var(--navy-700);overflow:hidden}
+.vm-foto img{width:100%;height:100%;object-fit:cover;display:block}
+.vm-foto__credito{position:absolute;left:12px;bottom:10px;font-size:11px;color:#FFFFFF;opacity:.7}
+
+/* Card Volare Tour */
+.vm-card{background:var(--surface-card);border-radius:var(--radius-md);overflow:hidden;display:flex;flex-direction:column}
+.vm-card .vm-foto{height:160px}
+.vm-card__corpo{padding:20px var(--space-6) var(--space-6);display:flex;flex-direction:column;gap:6px}
+.vm-card__selo{font-size:13px;font-weight:500;color:var(--gold-700)}
+.vm-card__titulo{font-family:var(--font-sans);font-size:20px;line-height:26px;font-weight:600;letter-spacing:-.01em;margin:0;color:var(--navy-700)}
+.vm-card__texto{font-size:14px;line-height:20px;color:var(--ink-muted);margin:0 0 8px}
+
+@media (max-width:768px){
+  .vm-buscador__campos{grid-template-columns:1fr 1fr}
+  .vm-buscador__campos .vm-btn{grid-column:1/-1}
+  .vm-linha{grid-template-columns:1fr;gap:var(--space-4);padding:var(--space-4)}
+  .vm-topbar__nav{display:none}
+}

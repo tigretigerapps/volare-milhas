@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Volo Milhas — Minhas rotas</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif&amp;family=Hanken+Grotesk:wght@300;400;500;600&amp;display=swap">
+<style>
+body{margin:0;background:#F3F5F7}
+a{color:#7A6440}a:hover{color:#1D3956}
+</style>
+</helmet>
+<div style="font-family: 'Hanken Grotesk', system-ui, sans-serif; color: #1D3956; background: #F3F5F7; min-height: 100vh">
+
+<header style="display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 24px; height: 96px; padding: 0 40px; background: #132C47">
+<nav style="display: flex; gap: 24px; align-items: center"><a href="Main.dc.html" style="font-size: 15px; font-weight: 500; color: #FFFFFF; opacity: 0.78; text-decoration: none; padding: 36px 0 34px; border-bottom: 2px solid transparent">Buscar</a><a href="MinhasRotas.dc.html" style="font-size: 15px; font-weight: 500; color: #FFFFFF; text-decoration: none; padding: 36px 0 34px; border-bottom: 2px solid #A98D60">Minhas rotas<span style="display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; padding: 0 6px; margin-left: 6px; border-radius: 999px; background: #953543; color: #FFFFFF; font-size: 12px; font-weight: 600">1</span></a></nav>
+<a href="Main.dc.html" style="display: block"><img src="/brand/volo-logo-branco.svg" alt="Volo by Volare, ir para a home" style="height: 56px; width: auto; display: block"></a>
+<div style="display: flex; justify-content: flex-end"><a href="#" style="font-size: 15px; font-weight: 500; color: #FFFFFF; opacity: 0.78; text-decoration: none">Conta</a></div>
+</header>
+
+<main style="max-width: 1200px; margin: 0 auto; padding: 40px 24px 64px">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 24px">
+<div>
+<h1 style="margin: 0; font-weight: 600; font-size: 32px; line-height: 38px; letter-spacing: -0.01em">Minhas rotas</h1>
+<p style="margin: 6px 0 0; font-size: 15px; color: #5B6B7F">2 de 3 rotas com alerta. Conferimos todas uma vez por dia e avisamos você e a Volare quando o preço chega na sua meta.</p>
+</div>
+<button type="button" style="height: 44px; padding: 0 20px; border-radius: 6px; border: 1.5px solid #1D3956; background: #1D3956; color: #FFFFFF; font-family: inherit; font-size: 15px; font-weight: 600">Nova rota</button>
+</div>
+
+<div style="background: #FFFFFF; border-radius: 12px; overflow: hidden">
+
+<article style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; align-items: center; padding: 24px; border-bottom: 1px solid #DDE2E8">
+<div>
+<p style="margin: 0; font-size: 28px; line-height: 32px; font-weight: 300; letter-spacing: 0.02em">GRU <span style="color: #B9C3CF">–</span> LIS</p>
+<p style="margin: 4px 0 0; font-size: 14px; line-height: 20px; color: #5B6B7F">Ida entre 20 e 27 de janeiro<br>LATAM, TAP e Iberia</p>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; align-items: center; gap: 8px"><div style="height: 10px; border-radius: 2px; background: #B9C3CF; width: 100%"></div><span style="font-size: 13px; color: #5B6B7F; white-space: nowrap; font-variant-numeric: tabular-nums">Meta 40.000 mi</span></div>
+<div style="display: flex; align-items: center; gap: 8px"><div style="height: 10px; border-radius: 2px; background: #A98D60; width: 88%"></div><span style="font-size: 13px; color: #5B6B7F; white-space: nowrap; font-variant-numeric: tabular-nums">Hoje 35.000 mi</span></div>
+</div>
+<div>
+<p style="margin: 0; display: flex; align-items: center; gap: 8px; font-size: 18px; line-height: 24px; font-weight: 600; color: #953543"><span style="width: 8px; height: 8px; border-radius: 999px; background: #953543; flex: none"></span>Chegou ao seu preço-alvo</p>
+<p style="margin: 2px 0 12px; font-size: 13px; color: #5B6B7F">TAP, voo TP82, 20 de janeiro. A Volare já foi avisada.</p>
+<div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap">
+<a href="Resultados.dc.html" style="display: inline-flex; align-items: center; height: 38px; padding: 0 14px; border-radius: 6px; border: 1.5px solid #1D3956; color: #1D3956; font-size: 14px; font-weight: 500; text-decoration: none">Ver ofertas</a>
+<a href="#" style="font-size: 14px; font-weight: 500; text-underline-offset: 3px">Editar</a>
+</div>
+</div>
+</article>
+
+<article style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; align-items: center; padding: 24px; border-bottom: 1px solid #DDE2E8">
+<div>
+<p style="margin: 0; font-size: 28px; line-height: 32px; font-weight: 300; letter-spacing: 0.02em">POA <span style="color: #B9C3CF">–</span> REC</p>
+<p style="margin: 4px 0 0; font-size: 14px; line-height: 20px; color: #5B6B7F">Ida entre 20 e 26 de novembro<br>GOL, Azul e LATAM</p>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; align-items: center; gap: 8px"><div style="height: 10px; border-radius: 2px; background: #B9C3CF; width: 62%"></div><span style="font-size: 13px; color: #5B6B7F; white-space: nowrap; font-variant-numeric: tabular-nums">Meta R$ 900</span></div>
+<div style="display: flex; align-items: center; gap: 8px"><div style="height: 10px; border-radius: 2px; background: #A98D60; width: 100%; opacity: 0.4"></div><span style="font-size: 13px; color: #5B6B7F; white-space: nowrap; font-variant-numeric: tabular-nums">Hoje R$ 1.450</span></div>
+</div>
+<div>
+<p style="margin: 0; font-size: 18px; line-height: 24px; font-weight: 600">Monitorando</p>
+<p style="margin: 2px 0 12px; font-size: 13px; color: #5B6B7F">Última conferência hoje, às 04:00. Ainda R$ 550 acima da meta.</p>
+<div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap">
+<a href="Resultados.dc.html" style="display: inline-flex; align-items: center; height: 38px; padding: 0 14px; border-radius: 6px; border: 1.5px solid #1D3956; color: #1D3956; font-size: 14px; font-weight: 500; text-decoration: none">Ver ofertas</a>
+<a href="#" style="font-size: 14px; font-weight: 500; text-underline-offset: 3px">Editar</a>
+</div>
+</div>
+</article>
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding: 24px; background: #F3F5F7">
+<p style="margin: 0; flex: 1; font-size: 14px; line-height: 20px; color: #5B6B7F">Você ainda pode salvar mais 1 rota. Escolha uma janela de até 7 dias e um preço-alvo em milhas, em reais ou nos dois.</p>
+<button type="button" style="height: 38px; padding: 0 14px; border-radius: 6px; border: 1.5px solid #1D3956; background: #FFFFFF; color: #1D3956; font-family: inherit; font-size: 14px; font-weight: 500">Salvar nova rota</button>
+</div>
+
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+/* Volo Milhas — tokens do design system (fonte: design system "Volo Milhas" no claude.ai).
+ * Modo claro apenas. Hex nas variáveis --vm-*; triplas HSL nas variáveis do shadcn/ui.
+ * Importar no src/index.css ANTES de @tailwind base. */
+
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Hanken+Grotesk:wght@300;400;500;600&display=swap');
+
+:root {
+  /* Cores da marca e da interface */
+  --vm-navy-900: #132C47;  /* Navy profundo do logo */
+  --vm-navy-700: #1D3956;  /* Tinta principal: títulos, texto, horários, botão primário e contorno dos CTAs */
+  --vm-gold-500: #A98D60;  /* Dourado do wordmark */
+  --vm-gold-700: #7A6440;  /* Dourado escuro para TEXTO sobre fundo claro: veredito 'Milhas economizam R$ 120', destaques e links de marca */
+  --vm-gold-300: #E8D6B2;  /* Dourado claro para TEXTO pequeno sobre fotos e fundos escuros, como o 'Destino da semana' no hero (4.7:1 sobre o céu com camada navy, 9.9:1 sobre navy-900) */
+  --vm-burgundy-600: #953543;  /* Bordô da versão alternativa do logo */
+  --vm-surface-page: #F3F5F7;  /* Fundo da página (modo claro, cinza-azulado frio, nunca creme) */
+  --vm-surface-card: #FFFFFF;  /* Linhas de resultado, campos, bloco do buscador e cards de conteúdo */
+  --vm-ink-muted: #5B6B7F;  /* Texto secundário: detalhes do voo, legendas, rótulos */
+  --vm-line: #DDE2E8;  /* Fios decorativos entre linhas de resultado e divisores */
+  --vm-border-control: #7A889B;  /* Borda de campos e controles (3.3:1 em surface-page, 3.6:1 no branco) */
+  --vm-bar-dinheiro: #B9C3CF;  /* Barra do valor em dinheiro na régua */
+
+  /* Tipografia */
+  --vm-font-display: "Instrument Serif", Georgia, "Times New Roman", serif; /* SÓ o título do hero */
+  --vm-font-sans: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Espaçamento */
+  --vm-space-2: 8px;
+  --vm-space-4: 16px;
+  --vm-space-6: 24px;
+  --vm-space-10: 40px;
+
+  /* Raios */
+  --vm-radius-sm: 6px;   /* botões e campos */
+  --vm-radius-md: 12px;  /* buscador, cards, blocos da lista */
+  --vm-radius-pill: 999px;
+
+  /* Mapeamento para o shadcn/ui (HSL sem hsl()) */
+  --background: 210 20% 96%;
+  --foreground: 211 50% 23%;
+  --card: 0 0% 100%;
+  --card-foreground: 211 50% 23%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 211 50% 23%;
+  --primary: 211 50% 23%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 210 20% 96%;
+  --secondary-foreground: 211 50% 23%;
+  --muted: 210 20% 96%;
+  --muted-foreground: 213 17% 43%;
+  --accent: 37 30% 52%;
+  --accent-foreground: 211 58% 18%;
+  --destructive: 351 48% 40%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 213 19% 89%;
+  --input: 215 14% 54%;
+  --ring: 211 50% 23%;
+  --radius: 0.375rem; /* 6px */
+}
+
+body { background: var(--vm-surface-page); color: var(--vm-navy-700); font-family: var(--vm-font-sans); -webkit-font-smoothing: antialiased; }
+.vm-num { font-variant-numeric: tabular-nums; }

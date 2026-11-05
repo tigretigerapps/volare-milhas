@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Volo Milhas — Home</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif&amp;family=Hanken+Grotesk:wght@300;400;500;600&amp;display=swap">
+<style>
+body{margin:0;background:#F3F5F7}
+a{color:#7A6440}a:hover{color:#1D3956}
+</style>
+</helmet>
+<div style="font-family: 'Hanken Grotesk', system-ui, sans-serif; color: #1D3956; background: #F3F5F7; min-height: 100vh">
+
+<header style="display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 24px; height: 96px; padding: 0 40px; background: #132C47">
+<nav style="display: flex; gap: 24px; align-items: center"><a href="Main.dc.html" style="font-size: 15px; font-weight: 500; color: #FFFFFF; text-decoration: none; padding: 36px 0 34px; border-bottom: 2px solid #A98D60">Buscar</a><a href="MinhasRotas.dc.html" style="font-size: 15px; font-weight: 500; color: #FFFFFF; opacity: 0.78; text-decoration: none; padding: 36px 0 34px; border-bottom: 2px solid transparent">Minhas rotas<span style="display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; padding: 0 6px; margin-left: 6px; border-radius: 999px; background: #953543; color: #FFFFFF; font-size: 12px; font-weight: 600">1</span></a></nav>
+<a href="Main.dc.html" style="display: block"><img src="/brand/volo-logo-branco.svg" alt="Volo by Volare, ir para a home" style="height: 56px; width: auto; display: block"></a>
+<div style="display: flex; justify-content: flex-end"><a href="#" style="font-size: 15px; font-weight: 500; color: #FFFFFF; opacity: 0.78; text-decoration: none">Conta</a></div>
+</header>
+
+<section style="position: relative; height: 560px; background: #1D3956; overflow: hidden">
+<img src="{{ hero.src }}" alt="{{ hero.alt }}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: {{ hero.pos }}; display: block">
+<div style="position: absolute; inset: 0; background: {{ hero.overlay }}"></div>
+<div style="position: relative; max-width: 1200px; margin: 0 auto; padding: 56px 24px 0">
+<div style="max-width: 760px">
+<p style="margin: 0 0 12px; font-size: 15px; font-weight: 500; color: #E8D6B2">Destino da semana</p>
+<h1 style="margin: 0; font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 68px; line-height: 70px; color: {{ hero.texto }}">Lisboa por 35 mil milhas</h1>
+<p style="margin: 16px 0 0; max-width: 520px; font-size: 18px; line-height: 28px; color: {{ hero.texto }}; opacity: 0.88">Compare dinheiro e milhas em cada voo, com o seu milheiro, e deixe a Volare cuidar da emissão.</p>
+</div>
+</div>
+</section>
+
+<div style="max-width: 1200px; margin: -120px auto 0; padding: 0 24px; position: relative">
+<form style="background: #FFFFFF; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; align-items: end">
+<label style="display: flex; flex-direction: column; gap: 8px"><span style="font-size: 13px; font-weight: 500; color: #5B6B7F">De</span><input value="GRU" style="height: 48px; padding: 0 16px; border: 1px solid #7A889B; border-radius: 6px; font-family: inherit; font-size: 18px; font-weight: 600; color: #1D3956; background: #FFFFFF"></label>
+<label style="display: flex; flex-direction: column; gap: 8px"><span style="font-size: 13px; font-weight: 500; color: #5B6B7F">Para</span><input value="LIS" style="height: 48px; padding: 0 16px; border: 1px solid #7A889B; border-radius: 6px; font-family: inherit; font-size: 18px; font-weight: 600; color: #1D3956; background: #FFFFFF"></label>
+<label style="display: flex; flex-direction: column; gap: 8px"><span style="font-size: 13px; font-weight: 500; color: #5B6B7F">Ida</span><input value="20/01/2027" style="height: 48px; padding: 0 16px; border: 1px solid #7A889B; border-radius: 6px; font-family: inherit; font-size: 16px; color: #1D3956; background: #FFFFFF; font-variant-numeric: tabular-nums"></label>
+<label style="display: flex; flex-direction: column; gap: 8px"><span style="font-size: 13px; font-weight: 500; color: #5B6B7F">Volta</span><input placeholder="Só ida" style="height: 48px; padding: 0 16px; border: 1px solid #7A889B; border-radius: 6px; font-family: inherit; font-size: 16px; color: #1D3956; background: #FFFFFF"></label>
+<a href="Resultados.dc.html" style="display: inline-flex; align-items: center; justify-content: center; height: 48px; padding: 0 28px; border-radius: 6px; background: #1D3956; color: #FFFFFF; font-size: 15px; font-weight: 600; text-decoration: none">Buscar</a>
+</div>
+<p style="margin: 0; font-size: 14px; color: #5B6B7F">Seu milheiro: <strong style="color: #1D3956; font-weight: 600; font-variant-numeric: tabular-nums">R$ 20,00</strong>&nbsp; <a href="#" style="font-weight: 500; text-underline-offset: 3px">Editar</a>&nbsp; Buscamos GOL, Azul e LATAM nas rotas nacionais e até 3 companhias nas internacionais.</p>
+</form>
+</div>
+
+<section style="max-width: 1200px; margin: 0 auto; padding: 64px 24px 72px">
+<h2 style="margin: 0; font-weight: 600; font-size: 32px; line-height: 38px; letter-spacing: -0.01em">Da Volare Tour para você</h2>
+<p style="margin: 8px 0 24px; font-size: 16px; line-height: 24px; color: #5B6B7F">Quando a viagem pede mais que a passagem, a equipe da Volare monta o resto.</p>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px">
+<article style="background: #FFFFFF; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column">
+<img src="/fotos/card-destinos-porto.webp" alt="Ribeira do Porto e o rio Douro ao entardecer" style="height: 180px; width: 100%; object-fit: cover; display: block">
+<div style="padding: 20px 24px 24px; display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 13px; font-weight: 500; color: #7A6440">Destinos</span>
+<h3 style="margin: 0; font-weight: 600; font-size: 20px; line-height: 26px; letter-spacing: -0.01em">Lisboa e Porto</h3>
+<p style="margin: 0 0 8px; font-size: 14px; line-height: 20px; color: #5B6B7F">Roteiros montados pela Volare, com hotel e passeios.</p>
+<a href="#" style="font-size: 14px; font-weight: 500; text-underline-offset: 3px">Ver destinos</a>
+</div>
+</article>
+<article style="background: #FFFFFF; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column">
+<img src="/fotos/card-promocoes-nordeste.webp" alt="Praia de Porto de Galinhas com coqueiros e mar azul" style="height: 180px; width: 100%; object-fit: cover; display: block">
+<div style="padding: 20px 24px 24px; display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 13px; font-weight: 500; color: #7A6440">Promoções</span>
+<h3 style="margin: 0; font-weight: 600; font-size: 20px; line-height: 26px; letter-spacing: -0.01em">Nordeste em dezembro</h3>
+<p style="margin: 0 0 8px; font-size: 14px; line-height: 20px; color: #5B6B7F">Pacotes com preço fechado por tempo limitado. [Confirmar oferta com a Volare]</p>
+<a href="#" style="font-size: 14px; font-weight: 500; text-underline-offset: 3px">Ver promoções</a>
+</div>
+</article>
+<article style="background: #FFFFFF; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column">
+<img src="/fotos/card-clube-janela.webp" alt="Asa do avião vista pela janela, acima das nuvens" style="height: 180px; width: 100%; object-fit: cover; display: block">
+<div style="padding: 20px 24px 24px; display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 13px; font-weight: 500; color: #7A6440">Clube de Alertas</span>
+<h3 style="margin: 0; font-weight: 600; font-size: 20px; line-height: 26px; letter-spacing: -0.01em">Ofertas antes de todo mundo</h3>
+<p style="margin: 0 0 8px; font-size: 14px; line-height: 20px; color: #5B6B7F">As melhores tarifas garimpadas pela Volare, direto no seu WhatsApp.</p>
+<a href="#" style="font-size: 14px; font-weight: 500; text-underline-offset: 3px">Conhecer o clube</a>
+</div>
+</article>
+</div>
+</section>
+
+<footer style="background: #132C47; padding: 32px 24px">
+<div style="max-width: 1200px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 24px; align-items: center; justify-content: space-between">
+<img src="/brand/volo-logo-branco.svg" alt="Volo by Volare" style="height: 48px; width: auto; display: block">
+<p style="margin: 0; font-size: 13px; color: #FFFFFF; opacity: 0.78">Uma plataforma da Volare Tour. A emissão das passagens é feita pela equipe da Volare.</p>
+<nav style="display: flex; gap: 20px"><a href="#" style="font-size: 13px; color: #FFFFFF; opacity: 0.78">Termos de uso</a><a href="#" style="font-size: 13px; color: #FFFFFF; opacity: 0.78">Privacidade</a></nav>
+</div>
+</footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1640}}'>
+class Component extends DCLogic {
+renderVals() {
+return { hero: { src: '/fotos/hero-lisboa-panorama-desktop.webp', alt: 'Lisboa ao anoitecer, com a ponte 25 de Abril e o rio Tejo ao fundo', pos: '50% 40%', overlay: 'rgba(19, 44, 71, 0.30)', texto: '#FFFFFF' } };
+}
+}
+</script>
+</body>
+</html>
