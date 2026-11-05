@@ -44,12 +44,12 @@ export function Rotas() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-2xl font-medium">Minhas rotas</h1>
-          <p className="mt-1 text-sm text-texto-secundario">
+          <h1 className="text-2xl font-medium">Minhas rotas</h1>
+          <p className="mt-1 text-sm text-vm-ink-muted">
             Acompanhamos estas rotas e avisamos quando o preço chegar à sua meta.
           </p>
           {typeof limiteRotas === 'number' && (
-            <p className="mt-1 text-sm tabular-nums text-texto-secundario" data-testid="uso-rotas">
+            <p className="mt-1 text-sm tabular-nums text-vm-ink-muted" data-testid="uso-rotas">
               {limiteRotas === 0
                 ? 'Sua assinatura não está ativa: não é possível criar rotas novas.'
                 : `${ativas} de ${limiteRotas} rotas com alerta ativas${plano ? ` no plano ${plano.nome}` : ''}.`}
@@ -77,16 +77,16 @@ export function Rotas() {
       )}
 
       {carregando ? (
-        <p className="text-sm text-texto-secundario">Carregando suas rotas…</p>
+        <p className="text-sm text-vm-ink-muted">Carregando suas rotas…</p>
       ) : erroCarga ? (
-        <p role="alert" className="text-sm text-texto">
+        <p role="alert" className="text-sm text-vm-navy-700">
           {erroCarga}
         </p>
       ) : rotas.length === 0 ? (
         edicao === null && (
-          <div className="flex flex-col items-start gap-3 border-y border-fio py-8">
+          <div className="flex flex-col items-start gap-3 border-y border-vm-line py-8">
             <p>Você ainda não monitora nenhuma rota.</p>
-            <p className="text-sm text-texto-secundario">
+            <p className="text-sm text-vm-ink-muted">
               Escolha origem, destino, período e um preço-alvo. Quando aparecer uma oferta que bata a meta, você fica
               sabendo.
             </p>
@@ -97,7 +97,7 @@ export function Rotas() {
         )
       ) : (
         <section aria-label="Rotas monitoradas">
-          <ul className="divide-y divide-fio border-y border-fio">
+          <ul className="divide-y divide-vm-line border-y border-vm-line">
             {rotas.map((rota) => (
               <LinhaRota
                 key={rota.id}

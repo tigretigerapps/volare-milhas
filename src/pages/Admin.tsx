@@ -25,9 +25,9 @@ const abas = [
 type Aba = (typeof abas)[number]['id']
 
 function Estado({ carregando, erro, vazio, quantidade }: { carregando: boolean; erro: string | null; vazio: string; quantidade: number }) {
-  if (carregando) return <p className="py-6 text-sm text-texto-secundario">Carregando…</p>
-  if (erro) return <p role="alert" className="py-6 text-sm text-texto">{erro}</p>
-  if (quantidade === 0) return <p className="border-y border-fio py-6 text-sm text-texto-secundario">{vazio}</p>
+  if (carregando) return <p className="py-6 text-sm text-vm-ink-muted">Carregando…</p>
+  if (erro) return <p role="alert" className="py-6 text-sm text-vm-navy-700">{erro}</p>
+  if (quantidade === 0) return <p className="border-y border-vm-line py-6 text-sm text-vm-ink-muted">{vazio}</p>
   return null
 }
 
@@ -54,18 +54,18 @@ function LinhaLead({
   return (
     <li className="grid gap-3 py-4 md:grid-cols-[11rem_minmax(0,1fr)_14rem] md:items-start md:gap-6">
       <div>
-        <p className="font-display text-lg font-medium tabular-nums">{referenciaLead(lead.id)}</p>
-        <p className="text-sm tabular-nums text-texto-secundario">{formatarDataHora(lead.created_at)}</p>
+        <p className="text-lg font-medium tabular-nums">{referenciaLead(lead.id)}</p>
+        <p className="text-sm tabular-nums text-vm-ink-muted">{formatarDataHora(lead.created_at)}</p>
       </div>
 
       <div className="min-w-0 text-sm">
-        <p className="font-normal text-texto">{lead.profiles?.nome ?? 'Sem nome'}</p>
-        <p className="text-texto-secundario">{lead.profiles?.telefone ?? 'Sem telefone'}</p>
-        <p className="mt-1 text-texto-secundario">{resumirOferta(lead.oferta)}</p>
-        <p className={cn('mt-1', falhou ? 'text-texto' : 'text-texto-secundario')}>{rotuloCrm(lead)}</p>
-        {falhou && lead.crm_erro && <p className="mt-1 break-words text-xs text-texto-secundario">{lead.crm_erro}</p>}
+        <p className="font-normal text-vm-navy-700">{lead.profiles?.nome ?? 'Sem nome'}</p>
+        <p className="text-vm-ink-muted">{lead.profiles?.telefone ?? 'Sem telefone'}</p>
+        <p className="mt-1 text-vm-ink-muted">{resumirOferta(lead.oferta)}</p>
+        <p className={cn('mt-1', falhou ? 'text-vm-navy-700' : 'text-vm-ink-muted')}>{rotuloCrm(lead)}</p>
+        {falhou && lead.crm_erro && <p className="mt-1 break-words text-xs text-vm-ink-muted">{lead.crm_erro}</p>}
         {erro && (
-          <p role="alert" className="mt-1 text-texto">
+          <p role="alert" className="mt-1 text-vm-navy-700">
             {erro}
           </p>
         )}
@@ -79,7 +79,7 @@ function LinhaLead({
           id={`status-${lead.id}`}
           value={lead.status}
           onChange={(e) => void mudar(e.target.value)}
-          className="h-10 w-full rounded-md border border-input bg-superficie px-3 text-base text-texto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="h-10 w-full rounded-md border border-input bg-vm-surface-card px-3 text-base text-vm-navy-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           {statusLead.map((s) => (
             <option key={s.valor} value={s.valor}>
@@ -103,13 +103,13 @@ function Leads() {
   return (
     <section aria-label="Leads">
       {falhas > 0 && (
-        <p role="status" className="mb-3 rounded-md border border-fio bg-superficie p-3 text-sm text-texto">
+        <p role="status" className="mb-3 rounded-md border border-vm-line bg-vm-surface-card p-3 text-sm text-vm-navy-700">
           {falhas} {falhas === 1 ? 'lead não chegou' : 'leads não chegaram'} ao CRM. Use Reenviar ao CRM em cada um.
         </p>
       )}
       <Estado carregando={carregando} erro={erroCarga} quantidade={leads.length} vazio="Nenhum lead ainda. Eles aparecem quando um assinante toca em Quero essa oferta." />
       {leads.length > 0 && (
-        <ul className="divide-y divide-fio border-y border-fio">
+        <ul className="divide-y divide-vm-line border-y border-vm-line">
           {leads.map((lead) => (
             <LinhaLead key={lead.id} lead={lead} onStatus={mudarStatus} onReenviar={reenviar} />
           ))}
@@ -125,18 +125,18 @@ function LinhaAssinante({ a }: { a: AssinanteAdmin }) {
   return (
     <li className="grid gap-1 py-4 text-sm md:grid-cols-[minmax(0,1fr)_10rem_10rem_10rem] md:items-center md:gap-6">
       <div className="min-w-0">
-        <p className="font-normal text-texto">
+        <p className="font-normal text-vm-navy-700">
           {a.nome ?? 'Sem nome'}
-          {a.papel === 'admin' && <span className="ml-2 text-texto-secundario">(administrador)</span>}
+          {a.papel === 'admin' && <span className="ml-2 text-vm-ink-muted">(administrador)</span>}
         </p>
-        <p className="text-texto-secundario">{a.telefone ?? 'Sem telefone'}</p>
+        <p className="text-vm-ink-muted">{a.telefone ?? 'Sem telefone'}</p>
       </div>
-      <p className="text-texto">Plano {a.plano ?? 'nenhum'}</p>
-      <p className="text-texto">
+      <p className="text-vm-navy-700">Plano {a.plano ?? 'nenhum'}</p>
+      <p className="text-vm-navy-700">
         {status}
-        {a.assinatura?.acesso_ate && <span className="block text-texto-secundario">Cancelada, acesso até {a.assinatura.acesso_ate.split('-').reverse().join('/')}</span>}
+        {a.assinatura?.acesso_ate && <span className="block text-vm-ink-muted">Cancelada, acesso até {a.assinatura.acesso_ate.split('-').reverse().join('/')}</span>}
       </p>
-      <p className="tabular-nums text-texto-secundario">{proxima ? `Próxima cobrança ${proxima}` : 'Sem cobrança agendada'}</p>
+      <p className="tabular-nums text-vm-ink-muted">{proxima ? `Próxima cobrança ${proxima}` : 'Sem cobrança agendada'}</p>
     </li>
   )
 }
@@ -147,13 +147,13 @@ function Assinantes() {
     <section aria-label="Assinantes">
       <Estado carregando={carregando} erro={erroCarga} quantidade={assinantes.length} vazio="Nenhum assinante cadastrado." />
       {assinantes.length > 0 && (
-        <ul className="divide-y divide-fio border-y border-fio">
+        <ul className="divide-y divide-vm-line border-y border-vm-line">
           {assinantes.map((a) => (
             <LinhaAssinante key={a.id} a={a} />
           ))}
         </ul>
       )}
-      <p className="mt-3 text-sm text-texto-secundario">
+      <p className="mt-3 text-sm text-vm-ink-muted">
         A situação da assinatura passa a ser atualizada sozinha quando a cobrança recorrente for ligada.
       </p>
     </section>
@@ -189,8 +189,8 @@ function FormularioPlano({ plano, onSalvar }: { plano: Plano; onSalvar: (plano: 
   }
 
   return (
-    <form onSubmit={salvar} noValidate aria-label={`Plano ${plano.nome}`} className="flex flex-col gap-4 rounded-md border border-fio bg-superficie p-5">
-      <h3 className="font-display text-lg font-medium">{plano.nome}</h3>
+    <form onSubmit={salvar} noValidate aria-label={`Plano ${plano.nome}`} className="flex flex-col gap-4 rounded-md border border-vm-line bg-vm-surface-card p-5">
+      <h3 className="text-lg font-medium">{plano.nome}</h3>
       <div className="grid grid-cols-2 gap-3">
         <div className="flex flex-col gap-1.5">
           <Label htmlFor={`destinos-${plano.plano}`}>Destinos por dia</Label>
@@ -210,7 +210,7 @@ function FormularioPlano({ plano, onSalvar }: { plano: Plano; onSalvar: (plano: 
           {salvando ? 'Salvando…' : 'Salvar'}
         </Button>
         {mensagem && (
-          <p role={mensagem.erro ? 'alert' : 'status'} className="text-sm text-texto-secundario">
+          <p role={mensagem.erro ? 'alert' : 'status'} className="text-sm text-vm-ink-muted">
             {mensagem.texto}
           </p>
         )}
@@ -229,7 +229,7 @@ function Planos() {
           <FormularioPlano key={`${p.plano}-${p.destinos_por_dia}-${p.rotas_com_alerta}`} plano={p} onSalvar={salvar} />
         ))}
       </div>
-      <p className="mt-3 text-sm text-texto-secundario">
+      <p className="mt-3 text-sm text-vm-ink-muted">
         O novo limite vale na próxima busca ou rota de cada assinante. O novo preço vale para quem assinar a partir de agora; quem já assina continua com o valor combinado no Asaas.
       </p>
     </section>
@@ -259,7 +259,7 @@ function Alertas() {
   return (
     <section aria-label="Alertas" className="flex flex-col gap-4">
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-        <p className="text-sm text-texto-secundario">
+        <p className="text-sm text-vm-ink-muted">
           O sistema verifica as rotas salvas todo dia às 8h e avisa os assinantes quando um preço bate a meta.
         </p>
         <Button size="sm" onClick={() => void verificar()} disabled={verificando}>
@@ -267,20 +267,20 @@ function Alertas() {
         </Button>
       </div>
       {mensagem && (
-        <p role={mensagem.erro ? 'alert' : 'status'} className="rounded-md border border-fio bg-superficie p-3 text-sm text-texto">
+        <p role={mensagem.erro ? 'alert' : 'status'} className="rounded-md border border-vm-line bg-vm-surface-card p-3 text-sm text-vm-navy-700">
           {mensagem.texto}
         </p>
       )}
       <Estado carregando={carregando} erro={erroCarga} quantidade={execucoes.length} vazio="Nenhuma verificação ainda." />
       {execucoes.length > 0 && (
-        <ul className="divide-y divide-fio border-y border-fio">
+        <ul className="divide-y divide-vm-line border-y border-vm-line">
           {execucoes.map((e) => (
             <li key={e.id} className="grid gap-1 py-3 text-sm md:grid-cols-[11rem_8rem_minmax(0,1fr)] md:gap-6">
-              <p className="tabular-nums text-texto">{formatarDataHora(e.iniciado_em)}</p>
-              <p className="text-texto-secundario">{e.origem === 'agendador' ? 'Automática' : 'Manual'}</p>
-              <p className="tabular-nums text-texto-secundario">
+              <p className="tabular-nums text-vm-navy-700">{formatarDataHora(e.iniciado_em)}</p>
+              <p className="text-vm-ink-muted">{e.origem === 'agendador' ? 'Automática' : 'Manual'}</p>
+              <p className="tabular-nums text-vm-ink-muted">
                 {e.rotas_verificadas} rotas, {e.buscas} consultas, {e.alertas_gerados} alertas
-                {e.erros > 0 && <span className="text-texto">, {e.erros} falhas</span>}
+                {e.erros > 0 && <span className="text-vm-navy-700">, {e.erros} falhas</span>}
                 {e.detalhe && <span className="block">{e.detalhe}</span>}
               </p>
             </li>
@@ -295,9 +295,9 @@ export function Admin() {
   const [aba, setAba] = useState<Aba>('leads')
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="font-display text-2xl font-medium">Painel administrativo</h1>
+      <h1 className="text-2xl font-medium">Painel administrativo</h1>
 
-      <div role="tablist" aria-label="Seções do painel" className="flex gap-1 border-b border-fio">
+      <div role="tablist" aria-label="Seções do painel" className="flex gap-1 border-b border-vm-line">
         {abas.map((a) => (
           <button
             key={a.id}
@@ -309,7 +309,7 @@ export function Admin() {
             onClick={() => setAba(a.id)}
             className={cn(
               '-mb-px border-b-2 px-4 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-              aba === a.id ? 'border-texto font-medium text-texto' : 'border-transparent text-texto-secundario hover:text-texto',
+              aba === a.id ? 'border-vm-navy-700 font-medium text-vm-navy-700' : 'border-transparent text-vm-ink-muted hover:text-vm-navy-700',
             )}
           >
             {a.rotulo}

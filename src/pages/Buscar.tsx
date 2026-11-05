@@ -63,7 +63,7 @@ function MilheiroUsuario({
   if (editando) {
     return (
       <form onSubmit={salvar} noValidate className="flex flex-wrap items-center gap-2">
-        <label htmlFor="milheiro" className="text-texto-secundario">
+        <label htmlFor="milheiro" className="text-vm-ink-muted">
           Seu milheiro: R$
         </label>
         <Input
@@ -82,7 +82,7 @@ function MilheiroUsuario({
           Cancelar
         </Button>
         {erro && (
-          <p role="alert" className="basis-full text-texto">
+          <p role="alert" className="basis-full text-vm-navy-700">
             {erro}
           </p>
         )}
@@ -93,7 +93,7 @@ function MilheiroUsuario({
   return (
     <p className="flex flex-wrap items-baseline gap-x-3">
       <span>
-        <span className="text-texto-secundario">Seu milheiro: </span>
+        <span className="text-vm-ink-muted">Seu milheiro: </span>
         <span className="whitespace-nowrap font-normal tabular-nums">{formatarReaisComCentavos(valor)}</span>
       </span>
       <Button variant="link" onClick={abrir}>
@@ -103,13 +103,13 @@ function MilheiroUsuario({
   )
 }
 
-const linkDiscreto = 'text-texto underline underline-offset-4 decoration-fio hover:decoration-texto'
+const linkDiscreto = 'text-vm-navy-700 underline underline-offset-4 decoration-vm-line hover:decoration-vm-navy-700'
 
 function Aviso({ children, alerta = false }: { children: React.ReactNode; alerta?: boolean }) {
   return (
     <p
       role={alerta ? 'alert' : 'status'}
-      className="rounded-md border border-fio bg-superficie p-3 text-sm text-texto-secundario"
+      className="rounded-md border border-vm-line bg-vm-surface-card p-3 text-sm text-vm-ink-muted"
     >
       {children}
     </p>
@@ -136,11 +136,11 @@ function GrupoResultados({
   const ordenadas = ordenarOfertas(ofertas, criterio, milheiro)
   return (
     <section aria-label={titulo ?? 'Resultados'}>
-      {titulo && <h2 className="mb-2 font-display text-lg font-medium">{titulo}</h2>}
+      {titulo && <h2 className="mb-2 text-lg font-medium">{titulo}</h2>}
       {ordenadas.length === 0 ? (
-        <p className="border-y border-fio py-6 text-sm text-texto-secundario">{vazio}</p>
+        <p className="border-y border-vm-line py-6 text-sm text-vm-ink-muted">{vazio}</p>
       ) : (
-        <ul className="divide-y divide-fio border-y border-fio">
+        <ul className="divide-y divide-vm-line border-y border-vm-line">
           {ordenadas.map((oferta) => (
             <LinhaResultado key={oferta.id} oferta={oferta} milheiro={milheiro} onQuero={onQuero} lead={leads[oferta.id]} />
           ))}
@@ -212,7 +212,7 @@ export function Buscar() {
       <BarraBusca inicial={inicial} onBuscar={aoBuscar} buscando={estado.tipo === 'carregando'} />
 
       {uso && uso.destinos_limite !== null && (
-        <p className="-mt-3 text-sm tabular-nums text-texto-secundario" data-testid="uso-destinos">
+        <p className="-mt-3 text-sm tabular-nums text-vm-ink-muted" data-testid="uso-destinos">
           Hoje: {uso.destinos_usados} de {uso.destinos_limite} destinos diferentes.
         </p>
       )}
@@ -221,7 +221,7 @@ export function Buscar() {
         <MilheiroUsuario valor={milheiro} onAlterar={alterarMilheiro} />
 
         {ofertas.length > 0 && (
-          <p className="text-texto-secundario">
+          <p className="text-vm-ink-muted">
             Ordenar por{' '}
             {criterios.map((c, i) => (
               <span key={c.valor}>
@@ -232,8 +232,8 @@ export function Buscar() {
                   className={cn(
                     'rounded-sm underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                     criterio === c.valor
-                      ? 'font-medium text-texto'
-                      : 'underline decoration-fio hover:text-texto hover:decoration-texto',
+                      ? 'font-medium text-vm-navy-700'
+                      : 'underline decoration-vm-line hover:text-vm-navy-700 hover:decoration-vm-navy-700',
                   )}
                 >
                   {c.rotulo}

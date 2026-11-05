@@ -99,13 +99,13 @@ export function CampoAeroporto({
         placeholder={placeholder}
         autoComplete="off"
         required={required}
-        className="font-display text-lg font-light tracking-wide"
+        className="text-lg font-light tracking-wide"
         {...aria}
       />
       {descricao ? (
-        <p className="text-xs text-texto-secundario">{descricao}</p>
+        <p className="text-xs text-vm-ink-muted">{descricao}</p>
       ) : (
-        <p className="text-xs text-texto-secundario">Código ou nome da cidade</p>
+        <p className="text-xs text-vm-ink-muted">Código ou nome da cidade</p>
       )}
 
       {aberto && (
@@ -114,11 +114,11 @@ export function CampoAeroporto({
           role="listbox"
           aria-label={`Aeroportos para ${rotulo.toLowerCase()}`}
           className={cn(
-            'absolute top-[4.5rem] z-20 max-h-64 w-72 max-w-[calc(100vw-2rem)] overflow-auto rounded-md border border-fio bg-superficie py-1',
+            'absolute top-[4.5rem] z-20 max-h-64 w-72 max-w-[calc(100vw-2rem)] overflow-auto rounded-md border border-vm-line bg-vm-surface-card py-1',
             alinhar === 'direita' ? 'right-0' : 'left-0',
           )}
         >
-          {opcoes.length === 0 && <li className="px-3 py-2 text-sm text-texto-secundario">Nenhum aeroporto encontrado.</li>}
+          {opcoes.length === 0 && <li className="px-3 py-2 text-sm text-vm-ink-muted">Nenhum aeroporto encontrado.</li>}
           {opcoes.map((aeroporto, indice) => (
             <li
               key={aeroporto.codigo}
@@ -131,12 +131,12 @@ export function CampoAeroporto({
                 escolher(aeroporto)
               }}
               onMouseEnter={() => setAtivo(indice)}
-              className={cn('flex cursor-pointer gap-3 px-3 py-2 text-sm', indice === ativo && 'bg-fundo')}
+              className={cn('flex cursor-pointer gap-3 px-3 py-2 text-sm', indice === ativo && 'bg-vm-surface-page')}
             >
-              <span className="w-9 shrink-0 font-display font-medium tabular-nums">{aeroporto.codigo}</span>
+              <span className="w-9 shrink-0 font-medium tabular-nums">{aeroporto.codigo}</span>
               <span className="min-w-0">
-                <span className="block text-texto">{aeroporto.cidade}</span>
-                <span className="block text-xs text-texto-secundario">
+                <span className="block text-vm-navy-700">{aeroporto.cidade}</span>
+                <span className="block text-xs text-vm-ink-muted">
                   {aeroporto.nome} · {aeroporto.pais}
                 </span>
               </span>

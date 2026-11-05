@@ -13,23 +13,23 @@ type Props = {
 export function FormularioAuth({ titulo, subtitulo, onSubmit, erro, children, rodape }: Props) {
   return (
     <div className="mx-auto w-full max-w-sm">
-      <h1 className="font-display text-2xl font-medium">{titulo}</h1>
-      {subtitulo && <p className="mt-1 text-sm text-texto-secundario">{subtitulo}</p>}
+      <h1 className="text-2xl font-medium">{titulo}</h1>
+      {subtitulo && <p className="mt-1 text-sm text-vm-ink-muted">{subtitulo}</p>}
 
       <form
         onSubmit={onSubmit}
         noValidate
-        className="mt-6 flex flex-col gap-4 rounded-md border border-fio bg-superficie p-5"
+        className="mt-6 flex flex-col gap-4 rounded-md border border-vm-line bg-vm-surface-card p-5"
       >
         {children}
         {erro && (
-          <p role="alert" className="text-sm font-normal text-texto">
+          <p role="alert" className="text-sm font-normal text-vm-navy-700">
             {erro}
           </p>
         )}
       </form>
 
-      {rodape && <p className="mt-4 text-sm text-texto-secundario">{rodape}</p>}
+      {rodape && <p className="mt-4 text-sm text-vm-ink-muted">{rodape}</p>}
     </div>
   )
 }

@@ -24,7 +24,7 @@ type Props = {
 function Erro({ id, texto }: { id: string; texto?: string }) {
   if (!texto) return null
   return (
-    <p id={id} className="text-xs text-texto">
+    <p id={id} className="text-xs text-vm-navy-700">
       {texto}
     </p>
   )
@@ -67,9 +67,9 @@ export function FormularioRota({ titulo, inicial, onSalvar, onCancelar }: Props)
       onSubmit={salvar}
       noValidate
       aria-labelledby="formulario-rota-titulo"
-      className="flex flex-col gap-5 rounded-md border border-fio bg-superficie p-5"
+      className="flex flex-col gap-5 rounded-md border border-vm-line bg-vm-surface-card p-5"
     >
-      <h2 id="formulario-rota-titulo" className="font-display text-lg font-medium">
+      <h2 id="formulario-rota-titulo" className="text-lg font-medium">
         {titulo}
       </h2>
 
@@ -126,8 +126,8 @@ export function FormularioRota({ titulo, inicial, onSalvar, onCancelar }: Props)
       </div>
 
       <fieldset className="flex flex-col gap-2">
-        <legend className="text-sm text-texto-secundario">Preço-alvo</legend>
-        <p className="text-xs text-texto-secundario">
+        <legend className="text-sm text-vm-ink-muted">Preço-alvo</legend>
+        <p className="text-xs text-vm-ink-muted">
           Preencha um ou os dois. Avisamos quando aparecer uma oferta igual ou abaixo.
         </p>
         <div className="grid grid-cols-2 gap-3 md:max-w-md">
@@ -162,8 +162,8 @@ export function FormularioRota({ titulo, inicial, onSalvar, onCancelar }: Props)
       </fieldset>
 
       <fieldset className="flex flex-col gap-2">
-        <legend className="text-sm text-texto-secundario">Companhias</legend>
-        <p className="text-xs text-texto-secundario">Sem nenhuma marcada, monitoramos todas.</p>
+        <legend className="text-sm text-vm-ink-muted">Companhias</legend>
+        <p className="text-xs text-vm-ink-muted">Sem nenhuma marcada, monitoramos todas.</p>
         <div className="flex flex-wrap gap-2">
           {companhiasDisponiveis.map((c) => {
             const marcada = valores.companhias.includes(c.valor)
@@ -172,12 +172,12 @@ export function FormularioRota({ titulo, inicial, onSalvar, onCancelar }: Props)
                 key={c.valor}
                 className={cn(
                   'flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 text-sm transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring',
-                  marcada ? 'border-primario text-texto' : 'border-fio text-texto-secundario hover:border-texto-secundario',
+                  marcada ? 'border-vm-navy-700 text-vm-navy-700' : 'border-vm-line text-vm-ink-muted hover:border-vm-ink-muted',
                 )}
               >
                 <input
                   type="checkbox"
-                  className="h-4 w-4 accent-[rgb(var(--primario))]"
+                  className="h-4 w-4 accent-vm-navy-700"
                   checked={marcada}
                   onChange={() => alternarCompanhia(c.valor)}
                 />
@@ -189,7 +189,7 @@ export function FormularioRota({ titulo, inicial, onSalvar, onCancelar }: Props)
       </fieldset>
 
       {erroEnvio && (
-        <p role="alert" className="text-sm text-texto">
+        <p role="alert" className="text-sm text-vm-navy-700">
           {erroEnvio}
         </p>
       )}

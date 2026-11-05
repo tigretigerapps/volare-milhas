@@ -29,9 +29,9 @@ export function Cadastro() {
   if (confirmarEmail) {
     return (
       <div className="mx-auto w-full max-w-sm">
-        <h1 className="font-display text-2xl font-medium">Confira seu e-mail</h1>
-        <p className="mt-2 text-texto-secundario">
-          Enviamos um link de confirmação para <span className="font-normal text-texto">{confirmarEmail}</span>. Abra o
+        <h1 className="text-2xl font-medium">Confira seu e-mail</h1>
+        <p className="mt-2 text-vm-ink-muted">
+          Enviamos um link de confirmação para <span className="font-normal text-vm-navy-700">{confirmarEmail}</span>. Abra o
           link para ativar sua conta e depois entre.
         </p>
         <Button asChild variant="contorno" className="mt-6">
@@ -87,7 +87,7 @@ export function Cadastro() {
       rodape={
         <>
           Já tem conta?{' '}
-          <Link to="/entrar" state={location.state} className="text-texto underline underline-offset-4 decoration-fio hover:decoration-texto">
+          <Link to="/entrar" state={location.state} className="text-vm-navy-700 underline underline-offset-4 decoration-vm-line hover:decoration-vm-navy-700">
             Entrar
           </Link>
         </>
@@ -131,20 +131,20 @@ export function Cadastro() {
         onChange={(e) => setSenha(e.target.value)}
         required
       />
-      <label className="flex items-start gap-2 text-sm text-texto-secundario">
+      <label className="flex items-start gap-2 text-sm text-vm-ink-muted">
         <input
           type="checkbox"
           checked={aceitou}
           onChange={(e) => setAceitou(e.target.checked)}
-          className="mt-1 h-4 w-4 shrink-0 accent-primario"
+          className="mt-1 h-4 w-4 shrink-0 accent-vm-navy-700"
         />
         <span>
           Li e aceito os{' '}
-          <Link to="/termos" target="_blank" className="text-texto underline underline-offset-4 decoration-fio hover:decoration-texto">
+          <Link to="/termos" target="_blank" className="text-vm-navy-700 underline underline-offset-4 decoration-vm-line hover:decoration-vm-navy-700">
             Termos de uso
           </Link>{' '}
           e a{' '}
-          <Link to="/privacidade" target="_blank" className="text-texto underline underline-offset-4 decoration-fio hover:decoration-texto">
+          <Link to="/privacidade" target="_blank" className="text-vm-navy-700 underline underline-offset-4 decoration-vm-line hover:decoration-vm-navy-700">
             Política de privacidade
           </Link>
           .

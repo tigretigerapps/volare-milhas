@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { supabase } from '@/integrations/supabase/client'
 import { traduzirErroAuth } from '@/lib/erros-auth'
 
-const classeLink = 'text-texto underline underline-offset-4 decoration-fio hover:decoration-texto'
+const classeLink = 'text-vm-navy-700 underline underline-offset-4 decoration-vm-line hover:decoration-vm-navy-700'
 
 export function EsqueciSenha() {
   const [email, setEmail] = useState('')
@@ -18,9 +18,9 @@ export function EsqueciSenha() {
   if (enviadoPara) {
     return (
       <div className="mx-auto w-full max-w-sm">
-        <h1 className="font-display text-2xl font-medium">Confira seu e-mail</h1>
-        <p className="mt-2 text-texto-secundario">
-          Se existir uma conta com <span className="font-normal text-texto">{enviadoPara}</span>, enviamos um link para
+        <h1 className="text-2xl font-medium">Confira seu e-mail</h1>
+        <p className="mt-2 text-vm-ink-muted">
+          Se existir uma conta com <span className="font-normal text-vm-navy-700">{enviadoPara}</span>, enviamos um link para
           criar uma nova senha. Ele vale por pouco tempo.
         </p>
         <Button asChild variant="contorno" className="mt-6">

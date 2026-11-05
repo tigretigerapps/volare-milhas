@@ -47,7 +47,7 @@ function FormularioDados({ perfil }: { perfil: Perfil }) {
   }
 
   return (
-    <form onSubmit={salvar} noValidate className="flex flex-col gap-4 rounded-md border border-fio bg-superficie p-5">
+    <form onSubmit={salvar} noValidate className="flex flex-col gap-4 rounded-md border border-vm-line bg-vm-surface-card p-5">
       <CampoTexto id="conta-nome" rotulo="Nome" autoComplete="name" value={nome} onChange={(e) => setNome(e.target.value)} />
       <CampoTexto
         id="conta-telefone"
@@ -73,7 +73,7 @@ function FormularioDados({ perfil }: { perfil: Perfil }) {
           {salvando ? 'Salvando…' : 'Salvar'}
         </Button>
         {mensagem && (
-          <p role="status" className="text-sm text-texto-secundario">
+          <p role="status" className="text-sm text-vm-ink-muted">
             {mensagem}
           </p>
         )}
@@ -109,36 +109,36 @@ function AlertasTelegram() {
   }
 
   return (
-    <section aria-labelledby="titulo-telegram" className="border-t border-fio pt-5">
+    <section aria-labelledby="titulo-telegram" className="border-t border-vm-line pt-5">
       <h2 id="titulo-telegram" className="font-normal">
         Alertas no Telegram
       </h2>
       {carregando ? (
-        <p className="mt-1 text-sm text-texto-secundario">Carregando…</p>
+        <p className="mt-1 text-sm text-vm-ink-muted">Carregando…</p>
       ) : conectado ? (
         <>
-          <p className="mt-1 text-sm text-texto-secundario">Telegram conectado. Você recebe aqui os alertas de preço das suas rotas.</p>
+          <p className="mt-1 text-sm text-vm-ink-muted">Telegram conectado. Você recebe aqui os alertas de preço das suas rotas.</p>
           <Button size="sm" variant="contorno" className="mt-3" onClick={() => void sair()} disabled={trabalhando}>
             {trabalhando ? 'Desconectando…' : 'Desconectar'}
           </Button>
         </>
       ) : (
         <>
-          <p className="mt-1 text-sm text-texto-secundario">
+          <p className="mt-1 text-sm text-vm-ink-muted">
             Receba no Telegram o aviso quando um preço bater a meta de uma rota.
           </p>
           <Button size="sm" className="mt-3" onClick={() => void abrirTelegram()} disabled={trabalhando}>
             {trabalhando ? 'Abrindo…' : 'Conectar Telegram'}
           </Button>
           {aberto && (
-            <p role="status" className="mt-2 text-sm text-texto-secundario">
+            <p role="status" className="mt-2 text-sm text-vm-ink-muted">
               No Telegram, toque em Iniciar e depois volte a esta página. O link vale por 15 minutos.
             </p>
           )}
         </>
       )}
       {erro && (
-        <p role="alert" className="mt-2 text-sm text-texto">
+        <p role="alert" className="mt-2 text-sm text-vm-navy-700">
           {erro}
         </p>
       )}
@@ -170,10 +170,10 @@ function GerenciarAssinatura({ plano }: { plano: string }) {
     <div className="mt-3 flex flex-col gap-2 text-sm">
       {situacao.tipo === 'ativa' && (
         <>
-          {situacao.renovaEm && <p className="text-texto-secundario">Renova em {dataBR(situacao.renovaEm)}.</p>}
+          {situacao.renovaEm && <p className="text-vm-ink-muted">Renova em {dataBR(situacao.renovaEm)}.</p>}
           {confirmando ? (
-            <div role="alertdialog" aria-label="Confirmar cancelamento" className="flex flex-col gap-2 rounded-md border border-fio bg-superficie p-3">
-              <p className="text-texto">
+            <div role="alertdialog" aria-label="Confirmar cancelamento" className="flex flex-col gap-2 rounded-md border border-vm-line bg-vm-surface-card p-3">
+              <p className="text-vm-navy-700">
                 Cancelar a assinatura?
                 {situacao.renovaEm
                   ? ` Você continua com acesso até ${dataBR(situacao.renovaEm)} e não será cobrado de novo.`
@@ -199,7 +199,7 @@ function GerenciarAssinatura({ plano }: { plano: string }) {
       )}
       {situacao.tipo === 'cancelada' && (
         <>
-          <p className="text-texto">Assinatura cancelada. Seu acesso vai até {dataBR(situacao.acessoAte)}.</p>
+          <p className="text-vm-navy-700">Assinatura cancelada. Seu acesso vai até {dataBR(situacao.acessoAte)}.</p>
           <div>
             <Button size="sm" variant="contorno" onClick={() => void executar(() => reativar(plano))} disabled={trabalhando}>
               {trabalhando ? 'Reativando…' : 'Reativar assinatura'}
@@ -208,7 +208,7 @@ function GerenciarAssinatura({ plano }: { plano: string }) {
         </>
       )}
       {erro && (
-        <p role="alert" className="text-texto">
+        <p role="alert" className="text-vm-navy-700">
           {erro}
         </p>
       )}
@@ -224,23 +224,23 @@ export function Conta() {
   return (
     <div className="mx-auto flex w-full max-w-lg flex-col gap-6">
       <div>
-        <h1 className="font-display text-2xl font-medium">Conta</h1>
-        <p className="mt-1 text-sm text-texto-secundario">{user?.email}</p>
+        <h1 className="text-2xl font-medium">Conta</h1>
+        <p className="mt-1 text-sm text-vm-ink-muted">{user?.email}</p>
       </div>
 
       {perfil ? (
         // A key recria o formulário com os valores do banco quando o perfil chega ou muda de usuário.
         <FormularioDados key={perfil.id} perfil={perfil} />
       ) : (
-        <p className="text-sm text-texto-secundario">Carregando seus dados…</p>
+        <p className="text-sm text-vm-ink-muted">Carregando seus dados…</p>
       )}
 
       {perfil && (
-        <section aria-labelledby="titulo-plano" className="border-t border-fio pt-5">
+        <section aria-labelledby="titulo-plano" className="border-t border-vm-line pt-5">
           <h2 id="titulo-plano" className="font-normal">
             Plano
           </h2>
-          <p className="mt-1 text-sm text-texto-secundario">
+          <p className="mt-1 text-sm text-vm-ink-muted">
             {perfil.plano
               ? `${nomesPlano[perfil.plano] ?? perfil.plano}, ${descricaoStatus[perfil.status_assinatura] ?? perfil.status_assinatura}.`
               : 'Você ainda não assinou um plano.'}
@@ -254,7 +254,7 @@ export function Conta() {
             <GerenciarAssinatura plano={perfil.plano} />
           )}
           {plano && perfil.status_assinatura === 'ativo' && (
-            <p className="text-sm text-texto-secundario">
+            <p className="text-sm text-vm-ink-muted">
               Até {plano.destinos_por_dia} destinos diferentes por dia e {plano.rotas_com_alerta} rotas com alerta.
             </p>
           )}
@@ -263,7 +263,7 @@ export function Conta() {
 
       <AlertasTelegram />
 
-      <div className="border-t border-fio pt-5">
+      <div className="border-t border-vm-line pt-5">
         <Button variant="contorno" onClick={() => void sair()}>
           Sair da conta
         </Button>

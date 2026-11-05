@@ -26,14 +26,14 @@ export function LinhaRota({ rota, onEditar, onAlternarAtivo, onExcluir }: Props)
   return (
     <li className="grid gap-4 py-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-8">
       <div className={cn(!rota.ativo && 'opacity-60')}>
-        <p className="font-display text-2xl font-light leading-tight">
+        <p className="text-2xl font-light leading-tight">
           {rota.origem} para {rota.destino}
         </p>
         <p className="mt-1 text-sm tabular-nums">
           {descreverAlvo(rota)}
-          {!rota.ativo && <span className="text-texto-secundario">, pausada</span>}
+          {!rota.ativo && <span className="text-vm-ink-muted">, pausada</span>}
         </p>
-        <p className="text-sm text-texto-secundario">
+        <p className="text-sm text-vm-ink-muted">
           {formatarPeriodo(rota.data_inicio, rota.data_fim)}, {descreverCompanhias(rota.companhias)}
         </p>
       </div>
@@ -63,7 +63,7 @@ export function LinhaRota({ rota, onEditar, onAlternarAtivo, onExcluir }: Props)
       )}
 
       {erro && (
-        <p role="alert" className="text-sm text-texto md:col-span-2">
+        <p role="alert" className="text-sm text-vm-navy-700 md:col-span-2">
           {erro}
         </p>
       )}

@@ -22,14 +22,14 @@ export function LinhaResultado({ oferta, milheiro, onQuero, lead }: Props) {
   return (
     <li className="grid gap-4 py-5 md:grid-cols-[13rem_minmax(0,1fr)_17rem] md:items-center md:gap-8">
       <div>
-        <p className="font-display text-3xl font-light leading-tight tabular-nums">
+        <p className="text-3xl font-light leading-tight tabular-nums">
           {oferta.partida} – {oferta.chegada}
         </p>
-        <p className="mt-1 text-sm text-texto-secundario">
+        <p className="mt-1 text-sm text-vm-ink-muted">
           {oferta.origem} para {oferta.destino}, {formatarParadas(oferta.paradas)},{' '}
           <span className="tabular-nums">{formatarDuracao(oferta.duracaoMinutos)}</span>
         </p>
-        <p className="text-sm text-texto-secundario">
+        <p className="text-sm text-vm-ink-muted">
           {oferta.programa}, voo {oferta.voo}
         </p>
       </div>
@@ -49,13 +49,13 @@ export function LinhaResultado({ oferta, milheiro, onQuero, lead }: Props) {
           {enviando ? 'Enviando…' : enviado ? 'Pedido enviado' : 'Quero essa oferta'}
         </Button>
         {lead?.tipo === 'ok' && (
-          <p className="text-sm text-texto-secundario" role="status">
+          <p className="text-sm text-vm-ink-muted" role="status">
             A equipe da Volare vai falar com você. Referência {lead.referencia}.
             {lead.simulado && ' (Teste: nada foi enviado ao CRM.)'}
           </p>
         )}
         {lead?.tipo === 'erro' && (
-          <p className="text-sm text-texto" role="alert">
+          <p className="text-sm text-vm-navy-700" role="alert">
             {lead.mensagem}
           </p>
         )}

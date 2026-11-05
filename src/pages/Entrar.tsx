@@ -47,7 +47,7 @@ export function Entrar() {
       rodape={
         <>
           Ainda não tem conta?{' '}
-          <Link to="/cadastro" state={location.state} className="text-texto underline underline-offset-4 decoration-fio hover:decoration-texto">
+          <Link to="/cadastro" state={location.state} className="text-vm-navy-700 underline underline-offset-4 decoration-vm-line hover:decoration-vm-navy-700">
             Criar conta
           </Link>
         </>
@@ -74,7 +74,7 @@ export function Entrar() {
       <Button type="submit" disabled={enviando}>
         {enviando ? 'Entrando…' : 'Entrar'}
       </Button>
-      <Link to="/esqueci-senha" className="text-sm text-texto-secundario underline underline-offset-4 decoration-fio hover:text-texto hover:decoration-texto">
+      <Link to="/esqueci-senha" className="text-sm text-vm-ink-muted underline underline-offset-4 decoration-vm-line hover:text-vm-navy-700 hover:decoration-vm-navy-700">
         Esqueci minha senha
       </Link>
     </FormularioAuth>

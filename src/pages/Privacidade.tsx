@@ -4,7 +4,7 @@ import { DocumentoLegal } from '@/components/DocumentoLegal'
 import { empresa } from '@/lib/empresa'
 
 const contato = (
-  <a className="text-texto underline underline-offset-4 decoration-fio hover:decoration-texto" href={`mailto:${empresa.email}`}>
+  <a className="text-vm-navy-700 underline underline-offset-4 decoration-vm-line hover:decoration-vm-navy-700" href={`mailto:${empresa.email}`}>
     {empresa.email}
   </a>
 )
@@ -17,7 +17,7 @@ export function Privacidade() {
         <p>
           Esta política explica como {empresa.nome} (CNPJ {empresa.cnpj}), responsável pela plataforma {empresa.fantasia} Milhas, trata os seus dados
           pessoais, de acordo com a Lei Geral de Proteção de Dados (Lei 13.709/2018). Os{' '}
-          <Link className="text-texto underline underline-offset-4 decoration-fio hover:decoration-texto" to="/termos">
+          <Link className="text-vm-navy-700 underline underline-offset-4 decoration-vm-line hover:decoration-vm-navy-700" to="/termos">
             Termos de uso
           </Link>{' '}
           complementam este texto.

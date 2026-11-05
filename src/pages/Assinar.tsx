@@ -28,8 +28,8 @@ export function Assinar() {
   if (status === 'ativo') {
     return (
       <div className="mx-auto w-full max-w-lg">
-        <h1 className="font-display text-2xl font-medium">Sua assinatura está ativa</h1>
-        <p className="mt-2 text-texto-secundario">Para trocar de plano, fale com a equipe da Volare.</p>
+        <h1 className="text-2xl font-medium">Sua assinatura está ativa</h1>
+        <p className="mt-2 text-vm-ink-muted">Para trocar de plano, fale com a equipe da Volare.</p>
         <Button asChild className="mt-6">
           <Link to="/buscar">Buscar voos</Link>
         </Button>
@@ -69,17 +69,17 @@ export function Assinar() {
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
       <div>
-        <h1 className="font-display text-2xl font-medium">Escolha seu plano</h1>
-        <p className="mt-1 text-sm text-texto-secundario">
+        <h1 className="text-2xl font-medium">Escolha seu plano</h1>
+        <p className="mt-1 text-sm text-vm-ink-muted">
           Cobrança mensal, paga por PIX, cartão ou boleto em uma página segura do Asaas. Você escolhe como pagar na hora.
         </p>
         {status && status !== 'pendente' && (
-          <p className="mt-1 text-sm text-texto-secundario">Situação atual: {situacaoAssinatura[status] ?? status}.</p>
+          <p className="mt-1 text-sm text-vm-ink-muted">Situação atual: {situacaoAssinatura[status] ?? status}.</p>
         )}
       </div>
 
       {carregando ? (
-        <p className="text-sm text-texto-secundario">Carregando planos…</p>
+        <p className="text-sm text-vm-ink-muted">Carregando planos…</p>
       ) : (
         <form onSubmit={enviar} noValidate className="flex flex-col gap-5">
           <fieldset className="grid gap-3 md:grid-cols-2">
@@ -88,8 +88,8 @@ export function Assinar() {
               <label
                 key={p.plano}
                 className={cn(
-                  'flex cursor-pointer flex-col gap-1 rounded-md border bg-superficie p-5 focus-within:ring-2 focus-within:ring-ring',
-                  plano === p.plano ? 'border-texto' : 'border-fio',
+                  'flex cursor-pointer flex-col gap-1 rounded-md border bg-vm-surface-card p-5 focus-within:ring-2 focus-within:ring-ring',
+                  plano === p.plano ? 'border-vm-navy-700' : 'border-vm-line',
                 )}
               >
                 <input
@@ -100,12 +100,12 @@ export function Assinar() {
                   onChange={() => setEscolhido(p.plano)}
                   className="sr-only"
                 />
-                <span className="font-display text-lg font-medium">{p.nome}</span>
-                <span className="font-display text-3xl font-light tabular-nums">
+                <span className="text-lg font-medium">{p.nome}</span>
+                <span className="text-3xl font-light tabular-nums">
                   {formatarReaisComCentavos(p.preco_mensal)}
-                  <span className="text-base text-texto-secundario"> por mês</span>
+                  <span className="text-base text-vm-ink-muted"> por mês</span>
                 </span>
-                <span className="mt-2 text-sm text-texto-secundario">
+                <span className="mt-2 text-sm text-vm-ink-muted">
                   Até {p.destinos_por_dia} destinos diferentes por dia e {p.rotas_com_alerta} rotas com alerta.
                 </span>
               </label>
@@ -124,7 +124,7 @@ export function Assinar() {
           />
 
           {erro && (
-            <p role="alert" className="text-sm text-texto">
+            <p role="alert" className="text-sm text-vm-navy-700">
               {erro}
             </p>
           )}

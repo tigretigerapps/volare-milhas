@@ -21,14 +21,14 @@ export function NovaSenha() {
   const [enviando, setEnviando] = useState(false)
 
   if (carregando) {
-    return <p className="text-texto-secundario">Validando o link…</p>
+    return <p className="text-vm-ink-muted">Validando o link…</p>
   }
 
   if (!session) {
     return (
       <div className="mx-auto w-full max-w-sm">
-        <h1 className="font-display text-2xl font-medium">Link inválido ou vencido</h1>
-        <p className="mt-2 text-texto-secundario">
+        <h1 className="text-2xl font-medium">Link inválido ou vencido</h1>
+        <p className="mt-2 text-vm-ink-muted">
           Este link para criar uma nova senha não vale mais. Peça um novo e abra-o em seguida.
         </p>
         <Button asChild className="mt-6">

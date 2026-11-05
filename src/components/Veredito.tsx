@@ -33,13 +33,13 @@ export function Veredito({ vencedor, diferenca, milheiro }: Props) {
     <div>
       <p
         className={cn(
-          'font-display text-lg font-medium leading-snug',
-          vencedor === 'milhas' ? 'text-economia-texto' : 'text-texto',
+          'text-lg font-medium leading-snug',
+          vencedor === 'milhas' ? 'text-vm-gold-700' : 'text-vm-navy-700',
         )}
       >
         {titulo}
       </p>
-      <p className="mt-0.5 text-sm text-texto-secundario">{detalhe}</p>
+      <p className="mt-0.5 text-sm text-vm-ink-muted">{detalhe}</p>
     </div>
   )
 }

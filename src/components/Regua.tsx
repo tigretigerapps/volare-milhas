@@ -33,16 +33,16 @@ export function Regua({ dinheiro, milhas, taxas, larguraDinheiro, larguraMilhas,
   return (
     <div className="flex flex-col gap-2.5 text-sm tabular-nums">
       <div className={linha}>
-        <Barra largura={larguraDinheiro} className="bg-dinheiro" />
-        <span className="whitespace-nowrap text-texto-secundario">
+        <Barra largura={larguraDinheiro} className="bg-vm-bar-dinheiro" />
+        <span className="whitespace-nowrap text-vm-ink-muted">
           <span className="sr-only">Em dinheiro: </span>
           {formatarReais(dinheiro)}
         </span>
       </div>
 
       <div className={linha}>
-        <Barra largura={larguraMilhas} className={cn('bg-economia', !milhasCompensam && 'opacity-40')} />
-        <span className="whitespace-nowrap text-texto">
+        <Barra largura={larguraMilhas} className={cn('bg-vm-gold-500', !milhasCompensam && 'opacity-40')} />
+        <span className="whitespace-nowrap text-vm-navy-700">
           <span className="sr-only">Com milhas: </span>
           {formatarMilhas(milhas)} mi + {formatarReais(taxas)}
         </span>

@@ -36,7 +36,7 @@ export function BarraBusca({ inicial, onBuscar, buscando = false }: Props) {
   return (
     <form
       onSubmit={enviar}
-      className="grid grid-cols-2 gap-3 rounded-md border border-fio bg-superficie p-4 md:grid-cols-[repeat(2,minmax(0,1.4fr))_repeat(2,minmax(0,1fr))_auto] md:items-start"
+      className="grid grid-cols-2 gap-3 rounded-md border border-vm-line bg-vm-surface-card p-4 md:grid-cols-[repeat(2,minmax(0,1.4fr))_repeat(2,minmax(0,1fr))_auto] md:items-start"
       aria-label="Buscar voos"
     >
       <CampoAeroporto

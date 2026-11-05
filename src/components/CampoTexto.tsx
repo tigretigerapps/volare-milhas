@@ -15,7 +15,7 @@ export function CampoTexto({ id, rotulo, ajuda, ...props }: Props) {
       <Label htmlFor={id}>{rotulo}</Label>
       <Input id={id} aria-describedby={ajuda ? `${id}-ajuda` : undefined} {...props} />
       {ajuda && (
-        <p id={`${id}-ajuda`} className="text-xs text-texto-secundario">
+        <p id={`${id}-ajuda`} className="text-xs text-vm-ink-muted">
           {ajuda}
         </p>
       )}

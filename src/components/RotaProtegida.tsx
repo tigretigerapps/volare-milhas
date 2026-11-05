@@ -9,7 +9,7 @@ export function RotaProtegida({ children }: { children: ReactNode }) {
   const location = useLocation()
 
   if (carregando) {
-    return <p className="text-sm text-texto-secundario">Carregando…</p>
+    return <p className="text-sm text-vm-ink-muted">Carregando…</p>
   }
 
   if (!session) {

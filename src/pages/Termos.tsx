@@ -4,7 +4,7 @@ import { DocumentoLegal } from '@/components/DocumentoLegal'
 import { empresa } from '@/lib/empresa'
 
 const contato = (
-  <a className="text-texto underline underline-offset-4 decoration-fio hover:decoration-texto" href={`mailto:${empresa.email}`}>
+  <a className="text-vm-navy-700 underline underline-offset-4 decoration-vm-line hover:decoration-vm-navy-700" href={`mailto:${empresa.email}`}>
     {empresa.email}
   </a>
 )
@@ -17,7 +17,7 @@ export function Termos() {
         <p>
           Estes termos valem para o uso da plataforma {empresa.fantasia} Milhas, operada por {empresa.nome}, CNPJ {empresa.cnpj}. Ao criar uma
           conta, você declara que leu e aceita estes termos e a{' '}
-          <Link className="text-texto underline underline-offset-4 decoration-fio hover:decoration-texto" to="/privacidade">
+          <Link className="text-vm-navy-700 underline underline-offset-4 decoration-vm-line hover:decoration-vm-navy-700" to="/privacidade">
             Política de privacidade
           </Link>
           .
