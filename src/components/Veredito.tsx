@@ -6,10 +6,12 @@ type Props = {
   vencedor: Vencedor
   diferenca: number
   milheiro: number
+  /** Taxa cobrada pelo programa na emissão (ex.: Azul). Troca o complemento quando existe. */
+  taxaResgate?: number
 }
 
-export function Veredito({ vencedor, diferenca, milheiro }: Props) {
-  const valor = <span className="whitespace-nowrap tabular-nums">{formatarReais(diferenca)}</span>
+export function Veredito({ vencedor, diferenca, milheiro, taxaResgate }: Props) {
+  const valor = <span className="whitespace-nowrap">{formatarReais(diferenca)}</span>
 
   const titulo =
     vencedor === 'milhas' ? (
@@ -23,9 +25,13 @@ export function Veredito({ vencedor, diferenca, milheiro }: Props) {
   const detalhe =
     vencedor === 'dinheiro' ? (
       'guarde suas milhas'
+    ) : taxaResgate ? (
+      <>
+        inclui <span className="whitespace-nowrap vm-num">{formatarReais(taxaResgate)}</span> de taxa de resgate
+      </>
     ) : (
       <>
-        com o seu milheiro a <span className="whitespace-nowrap tabular-nums">{formatarMilheiro(milheiro)}</span>
+        com o seu milheiro a <span className="whitespace-nowrap vm-num">{formatarMilheiro(milheiro)}</span>
       </>
     )
 
@@ -33,13 +39,13 @@ export function Veredito({ vencedor, diferenca, milheiro }: Props) {
     <div>
       <p
         className={cn(
-          'text-lg font-medium leading-snug',
+          'text-[19px] font-semibold leading-6 vm-num md:text-title',
           vencedor === 'milhas' ? 'text-vm-gold-700' : 'text-vm-navy-700',
         )}
       >
         {titulo}
       </p>
-      <p className="mt-0.5 text-sm text-vm-ink-muted">{detalhe}</p>
+      <p className="mt-0.5 text-[13px] leading-[18px] text-vm-ink-muted">{detalhe}</p>
     </div>
   )
 }

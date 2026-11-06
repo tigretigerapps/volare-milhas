@@ -140,7 +140,7 @@ function GrupoResultados({
       {ordenadas.length === 0 ? (
         <p className="border-y border-vm-line py-6 text-sm text-vm-ink-muted">{vazio}</p>
       ) : (
-        <ul className="divide-y divide-vm-line border-y border-vm-line">
+        <ul className="flex flex-col gap-3 md:block md:overflow-hidden md:rounded-vm-md md:bg-vm-surface-card">
           {ordenadas.map((oferta) => (
             <LinhaResultado key={oferta.id} oferta={oferta} milheiro={milheiro} onQuero={onQuero} lead={leads[oferta.id]} />
           ))}

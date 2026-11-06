@@ -26,14 +26,17 @@ SheetOverlay.displayName = SheetPrimitive.Overlay.displayName
 
 const SheetContent = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content>
->(({ className, children, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content> & { lado?: 'esquerda' | 'direita' }
+>(({ className, children, lado = 'direita', ...props }, ref) => (
   <SheetPortal>
     <SheetOverlay />
     <SheetPrimitive.Content
       ref={ref}
       className={cn(
-        'fixed inset-y-0 right-0 z-50 flex h-full w-3/4 max-w-xs flex-col gap-4 bg-vm-surface-card p-6 text-vm-navy-700 transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-200 data-[state=open]:duration-300 data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right',
+        'fixed inset-y-0 z-50 flex h-full w-3/4 max-w-xs flex-col gap-4 bg-vm-surface-card p-6 text-vm-navy-700 transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-200 data-[state=open]:duration-300 motion-reduce:!animate-none',
+        lado === 'esquerda'
+          ? 'left-0 data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left'
+          : 'right-0 data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right',
         className,
       )}
       {...props}

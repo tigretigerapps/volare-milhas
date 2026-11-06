@@ -51,3 +51,8 @@ export function formatarParadas(paradas: readonly string[]): string {
   if (codigos.length === 0) return rotulo
   return `${rotulo} em ${new Intl.ListFormat('pt-BR', { type: 'conjunction' }).format(codigos)}`
 }
+
+/** A Azul chama as milhas de pontos: "12.500 pts". As demais, "18.500 mi". */
+export function unidadeMilhas(oferta: { companhia?: string; programa: string }): 'pts' | 'mi' {
+  return /azul/i.test(oferta.companhia ?? oferta.programa) ? 'pts' : 'mi'
+}

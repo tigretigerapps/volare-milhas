@@ -97,6 +97,7 @@ describe('ofertaDoBanco', () => {
     expect(ofertaDoBanco(linha())).toEqual({
       id: 'o1',
       programa: 'Smiles',
+      companhia: 'GOL',
       voo: 'G31650',
       origem: 'GRU',
       destino: 'SSA',

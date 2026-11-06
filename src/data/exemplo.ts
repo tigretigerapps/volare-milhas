@@ -16,8 +16,12 @@ export type Oferta = {
   /** Preço da passagem paga em dinheiro, em reais. */
   dinheiro: number
   milhas: number
-  /** Taxas cobradas na emissão com milhas, em reais. */
+  /** Taxas cobradas na emissão com milhas, em reais (já incluem a taxa de resgate, quando houver). */
   taxas: number
+  /** Companhia aérea (GOL, AZUL, LATAM, TAP...). */
+  companhia?: string
+  /** Parte das taxas que é taxa de resgate (Azul), quando a fonte informa; aparece no veredito. */
+  taxaResgate?: number
   /** Só nas ofertas vindas da busca; as de exemplo são todas de ida. */
   sentido?: 'ida' | 'volta'
   /** "AAAA-MM-DD" do voo, só nas ofertas vindas da busca. */

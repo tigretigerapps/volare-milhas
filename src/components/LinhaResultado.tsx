@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button'
 import type { Oferta } from '@/data/exemplo'
 import type { EstadoLead } from '@/hooks/useLeads'
 import { compararOferta } from '@/lib/comparacao'
-import { formatarDuracao, formatarParadas } from '@/lib/formato'
+import { formatarDuracao, formatarParadas, unidadeMilhas } from '@/lib/formato'
 import { Regua } from './Regua'
 import { Veredito } from './Veredito'
 
@@ -14,20 +14,24 @@ type Props = {
   lead?: EstadoLead
 }
 
+/**
+ * Uma tarifa: voo, régua e veredito.
+ * Celular: card branco empilhado. Desktop: linha de 3 colunas dentro de um bloco branco, separada por fio.
+ */
 export function LinhaResultado({ oferta, milheiro, onQuero, lead }: Props) {
   const enviando = lead?.tipo === 'enviando'
   const enviado = lead?.tipo === 'ok'
   const comparacao = compararOferta(oferta, milheiro)
 
   return (
-    <li className="grid gap-4 py-5 md:grid-cols-[13rem_minmax(0,1fr)_17rem] md:items-center md:gap-8">
+    <li className="flex flex-col gap-3.5 rounded-vm-md bg-vm-surface-card p-4 md:grid md:grid-cols-[repeat(auto-fit,minmax(260px,1fr))] md:items-center md:gap-6 md:rounded-none md:border-b md:border-vm-line md:bg-transparent md:p-6 md:last:border-b-0">
       <div>
-        <p className="text-3xl font-light leading-tight tabular-nums">
+        <p className="text-[26px] font-light leading-8 vm-num md:text-numeral">
           {oferta.partida} – {oferta.chegada}
         </p>
         <p className="mt-1 text-sm text-vm-ink-muted">
           {oferta.origem} para {oferta.destino}, {formatarParadas(oferta.paradas)},{' '}
-          <span className="tabular-nums">{formatarDuracao(oferta.duracaoMinutos)}</span>
+          <span className="vm-num">{formatarDuracao(oferta.duracaoMinutos)}</span>
         </p>
         <p className="text-sm text-vm-ink-muted">
           {oferta.programa}, voo {oferta.voo}
@@ -40,22 +44,34 @@ export function LinhaResultado({ oferta, milheiro, onQuero, lead }: Props) {
         taxas={oferta.taxas}
         larguraDinheiro={comparacao.larguraDinheiro}
         larguraMilhas={comparacao.larguraMilhas}
-        milhasCompensam={comparacao.vencedor === 'milhas'}
+        vencedor={comparacao.vencedor}
+        diferenca={comparacao.diferencaArredondada}
+        unidade={unidadeMilhas(oferta)}
       />
 
-      <div className="flex flex-col items-start gap-3">
-        <Veredito vencedor={comparacao.vencedor} diferenca={comparacao.diferencaArredondada} milheiro={milheiro} />
-        <Button variant="contorno" size="sm" disabled={enviando || enviado} onClick={() => onQuero?.(oferta)}>
+      <div className="flex flex-col items-stretch gap-3 md:items-start">
+        <Veredito
+          vencedor={comparacao.vencedor}
+          diferenca={comparacao.diferencaArredondada}
+          milheiro={milheiro}
+          taxaResgate={oferta.taxaResgate}
+        />
+        <Button
+          variant="contorno"
+          className="w-full md:h-[38px] md:w-auto md:px-3.5"
+          disabled={enviando || enviado}
+          onClick={() => onQuero?.(oferta)}
+        >
           {enviando ? 'Enviando…' : enviado ? 'Pedido enviado' : 'Quero essa oferta'}
         </Button>
         {lead?.tipo === 'ok' && (
-          <p className="text-sm text-vm-ink-muted" role="status">
+          <p className="text-[13px] text-vm-ink-muted" role="status">
             A equipe da Volare vai falar com você. Referência {lead.referencia}.
             {lead.simulado && ' (Teste: nada foi enviado ao CRM.)'}
           </p>
         )}
         {lead?.tipo === 'erro' && (
-          <p className="text-sm text-vm-navy-700" role="alert">
+          <p className="text-[13px] text-vm-burgundy-600" role="alert">
             {lead.mensagem}
           </p>
         )}

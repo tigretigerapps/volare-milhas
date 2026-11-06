@@ -15,6 +15,8 @@ type Props = {
   required?: boolean
   /** Do lado em que a lista abre; use "direita" para campos perto da borda direita da tela. */
   alinhar?: 'esquerda' | 'direita'
+  /** Compacto: 44px, para a barra de busca da tela de resultados (sem a linha com o nome do aeroporto). */
+  compacto?: boolean
   'aria-invalid'?: boolean
   'aria-describedby'?: string
 }
@@ -33,6 +35,7 @@ export function CampoAeroporto({
   placeholder,
   required,
   alinhar = 'esquerda',
+  compacto = false,
   ...aria
 }: Props) {
   const idLista = useId()
@@ -75,8 +78,9 @@ export function CampoAeroporto({
   }
 
   return (
-    <div className="relative flex flex-col gap-1.5">
+    <div className={cn('flex min-w-0 flex-col', compacto ? 'gap-1.5' : 'gap-2')}>
       <Label htmlFor={id}>{rotulo}</Label>
+      <div className="relative">
       <Input
         id={id}
         role="combobox"
@@ -99,14 +103,12 @@ export function CampoAeroporto({
         placeholder={placeholder}
         autoComplete="off"
         required={required}
-        className="text-lg font-light tracking-wide"
+        className={cn(
+          'font-semibold uppercase tracking-[0.02em] placeholder:normal-case',
+          compacto ? 'h-11 px-3.5 text-[17px]' : 'text-lg',
+        )}
         {...aria}
       />
-      {descricao ? (
-        <p className="text-xs text-vm-ink-muted">{descricao}</p>
-      ) : (
-        <p className="text-xs text-vm-ink-muted">Código ou nome da cidade</p>
-      )}
 
       {aberto && (
         <ul
@@ -114,7 +116,7 @@ export function CampoAeroporto({
           role="listbox"
           aria-label={`Aeroportos para ${rotulo.toLowerCase()}`}
           className={cn(
-            'absolute top-[4.5rem] z-20 max-h-64 w-72 max-w-[calc(100vw-2rem)] overflow-auto rounded-md border border-vm-line bg-vm-surface-card py-1',
+            'absolute top-full z-20 mt-1 max-h-64 w-72 max-w-[calc(100vw-2rem)] overflow-auto rounded-vm-sm border border-vm-line bg-vm-surface-card py-1',
             alinhar === 'direita' ? 'right-0' : 'left-0',
           )}
         >
@@ -143,6 +145,11 @@ export function CampoAeroporto({
             </li>
           ))}
         </ul>
+      )}
+      </div>
+      {!compacto && (
+        // O nome do aeroporto escolhido (SSA = Salvador...), no estilo de ajuda do campo.
+        <p className="text-[13px] leading-[18px] text-vm-ink-muted">{descricao ?? 'Código ou nome da cidade'}</p>
       )}
     </div>
   )

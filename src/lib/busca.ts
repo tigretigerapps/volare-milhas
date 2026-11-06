@@ -87,6 +87,7 @@ export function ofertaDoBanco(linha: OfertaBanco): Oferta | null {
     dinheiro: linha.valor_dinheiro_rs,
     milhas: linha.milhas,
     taxas: linha.taxas_rs ?? 0,
+    companhia: linha.companhia,
     sentido: linha.sentido === 'volta' ? 'volta' : 'ida',
     dataVoo: linha.data_voo,
   }

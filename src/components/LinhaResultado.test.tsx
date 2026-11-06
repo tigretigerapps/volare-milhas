@@ -42,3 +42,21 @@ describe('LinhaResultado: Quero essa oferta', () => {
     expect(screen.getByRole('button', { name: 'Quero essa oferta' })).toBeEnabled()
   })
 })
+
+describe('LinhaResultado: régua e veredito', () => {
+  it('descreve a régua numa frase só e esconde as barras', () => {
+    renderizar()
+    const regua = screen.getByRole('img')
+    expect(regua.getAttribute('aria-label')?.replace(/\s/g, ' ')).toBe(
+      'Dinheiro R$ 528, milhas 18.500 mais R$ 38, milhas economizam R$ 120',
+    )
+    regua.querySelectorAll(':scope > div > *').forEach((barra) => expect(barra).toHaveAttribute('aria-hidden', 'true'))
+  })
+
+  it('usa pts e mostra a taxa de resgate na Azul', () => {
+    const azul = { ...oferta, companhia: 'Azul', programa: 'TudoAzul', taxaResgate: 40 }
+    renderizar({ oferta: azul })
+    expect(screen.getByRole('img').getAttribute('aria-label')).toContain('pontos')
+    if (screen.queryByText(/economizam/)) expect(screen.getByText(/de taxa de resgate/)).toBeInTheDocument()
+  })
+})
