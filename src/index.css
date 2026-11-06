@@ -10,7 +10,7 @@
   --vm-navy-700: #1D3956;  /* Tinta principal: títulos, texto, horários, botão primário e contorno dos CTAs */
   --vm-gold-500: #A98D60;  /* Dourado do wordmark */
   --vm-gold-700: #7A6440;  /* Dourado escuro para TEXTO sobre fundo claro: veredito 'Milhas economizam R$ 120', destaques e links de marca */
-  --vm-gold-300: #E8D6B2;  /* Dourado claro para TEXTO pequeno sobre fotos e fundos escuros, como o 'Destino da semana' no hero (4.7:1 sobre o céu com camada navy, 9.9:1 sobre navy-900) */
+  --vm-gold-300: #F5CF85;  /* Dourado claro e mais vivo para TEXTO pequeno sobre fotos e fundos escuros, como o 'Destino da semana' no hero (cerca de 4.5:1 sobre o céu com camada navy, 9:1 sobre navy-900) */
   --vm-burgundy-600: #953543;  /* Bordô da versão alternativa do logo */
   --vm-surface-page: #F3F5F7;  /* Fundo da página (modo claro, cinza-azulado frio, nunca creme) */
   --vm-surface-card: #FFFFFF;  /* Linhas de resultado, campos, bloco do buscador e cards de conteúdo */

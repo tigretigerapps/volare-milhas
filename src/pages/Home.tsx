@@ -41,7 +41,7 @@ export function Home() {
         <div className="absolute inset-0 bg-vm-navy-900 opacity-30" aria-hidden />
         <div className="relative mx-auto max-w-[1200px] px-4 pt-10 md:px-6 md:pt-14">
           <div className="max-w-[760px]">
-            <p className="mb-3 text-[15px] font-medium text-vm-gold-300">{destaque.rotulo}</p>
+            <p className="mb-3 text-[15px] font-semibold tracking-[0.02em] text-vm-gold-300">{destaque.rotulo}</p>
             <h1 className="font-display text-[44px] font-normal leading-[48px] text-white md:text-display-xl">
               {destaque.titulo}
             </h1>

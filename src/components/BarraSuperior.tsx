@@ -65,7 +65,7 @@ export function BarraSuperior({ alertasNaoLidos, admin = false }: Props) {
   return (
     <header className="bg-vm-navy-900 text-white">
       {/* Desktop: navegação à esquerda, logo no centro, conta à direita. */}
-      <div className="hidden h-24 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-6 px-10 md:grid">
+      <div className="mx-auto hidden h-24 max-w-[1200px] grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-6 px-6 md:grid">
         <nav aria-label="Principal">
           <ul className="flex items-center gap-8">
             {itens.map((link) => (
