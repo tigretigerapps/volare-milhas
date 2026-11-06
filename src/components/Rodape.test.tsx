@@ -22,10 +22,12 @@ describe('Rodape', () => {
 describe('CardVolareTour', () => {
   it('descreve a foto e só vira link quando há endereço', () => {
     const card = cardsVolareTour[0]
-    const { rerender } = render(<CardVolareTour card={card} />)
+    const { rerender } = render(<CardVolareTour card={{ ...card, url: null }} />)
     expect(screen.getByRole('img', { name: card.alt })).toBeInTheDocument()
     expect(screen.queryByRole('link')).not.toBeInTheDocument()
-    rerender(<CardVolareTour card={{ ...card, url: 'https://exemplo.com' }} />)
-    expect(screen.getByRole('link', { name: /Ver destinos/ })).toHaveAttribute('target', '_blank')
+    rerender(<CardVolareTour card={card} />)
+    const link = screen.getByRole('link', { name: /Ver destinos/ })
+    expect(link).toHaveAttribute('href', 'https://www.volaretour.com.br/destinations/destinos')
+    expect(link).toHaveAttribute('target', '_blank')
   })
 })
