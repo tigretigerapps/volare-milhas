@@ -74,7 +74,7 @@ export function Entrar() {
       <Button type="submit" disabled={enviando}>
         {enviando ? 'Entrando…' : 'Entrar'}
       </Button>
-      <Link to="/esqueci-senha" className="text-sm text-vm-ink-muted underline underline-offset-4 decoration-vm-line hover:text-vm-navy-700 hover:decoration-vm-navy-700">
+      <Link to="/esqueci-senha" className="inline-flex min-h-11 items-center self-start text-sm text-vm-ink-muted underline underline-offset-4 decoration-vm-line hover:text-vm-navy-700 hover:decoration-vm-navy-700">
         Esqueci minha senha
       </Link>
     </FormularioAuth>

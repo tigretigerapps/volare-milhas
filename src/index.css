@@ -72,4 +72,16 @@ body { background: var(--vm-surface-page); color: var(--vm-navy-700); font-famil
   html {
     -webkit-text-size-adjust: 100%;
   }
+
+  /* Quem pede menos movimento não vê barras crescendo, menu deslizando nem esqueleto piscando. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }
