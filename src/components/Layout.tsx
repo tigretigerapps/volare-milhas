@@ -1,29 +1,29 @@
-import { Link, Outlet } from 'react-router'
+import { Outlet } from 'react-router'
 
 import { useAlertas } from '@/contexts/useAlertas'
 import { useAuth } from '@/contexts/useAuth'
 import { BarraSuperior } from './BarraSuperior'
+import { Rodape } from './Rodape'
 
-export function Layout() {
+type Props = {
+  /**
+   * true: a página ocupa a largura toda e monta os próprios containers (home, resultados, rotas).
+   * false: conteúdo dentro do container padrão de 1200px (conta, entrar, termos…).
+   */
+  larguraTotal?: boolean
+}
+
+export function Layout({ larguraTotal = false }: Props) {
   const { naoVistos } = useAlertas()
   const { perfil } = useAuth()
 
   return (
-    <div className="min-h-dvh">
+    <div className="flex min-h-dvh flex-col">
       <BarraSuperior alertasNaoLidos={naoVistos} admin={perfil?.papel === 'admin'} />
-      <main className="container py-6 md:py-8">
+      <main className={larguraTotal ? 'flex-1' : 'container flex-1 py-6 md:py-10'}>
         <Outlet />
       </main>
-      <footer className="container border-t border-vm-line py-6 text-sm text-vm-ink-muted">
-        <nav aria-label="Informações legais" className="flex flex-wrap gap-x-5 gap-y-2">
-          <Link to="/termos" className="underline underline-offset-4 decoration-vm-line hover:text-vm-navy-700 hover:decoration-vm-navy-700">
-            Termos de uso
-          </Link>
-          <Link to="/privacidade" className="underline underline-offset-4 decoration-vm-line hover:text-vm-navy-700 hover:decoration-vm-navy-700">
-            Política de privacidade
-          </Link>
-        </nav>
-      </footer>
+      <Rodape />
     </div>
   )
 }
