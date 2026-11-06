@@ -1,10 +1,9 @@
 import { useId, useState, type FormEvent, type ReactNode } from 'react'
 
 import { CampoAeroporto } from '@/components/CampoAeroporto'
+import { CampoDatas, type FaseCalendario } from '@/components/CampoDatas'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { dataPorExtenso, hojeISO } from '@/lib/datas'
+import { dataPorExtenso } from '@/lib/datas'
 import { cn } from '@/lib/utils'
 
 export type ParametrosBusca = {
@@ -39,8 +38,7 @@ export function BarraBusca({ inicial, onBuscar, buscando = false, variante = 'no
   const compacto = variante === 'compacto'
   const idFormulario = useId()
   const [parametros, setParametros] = useState(inicial)
-  // "Volta" mostra o placeholder "Só ida" até o usuário escolher uma data.
-  const [voltaComoData, setVoltaComoData] = useState(Boolean(inicial.volta))
+  const [faseCalendario, setFaseCalendario] = useState<FaseCalendario | null>(null)
   // Celular, variante compacta: o formulário fica recolhido atrás do resumo até tocar em "Alterar".
   const [aberto, setAberto] = useState(false)
 
@@ -49,11 +47,15 @@ export function BarraBusca({ inicial, onBuscar, buscando = false, variante = 'no
 
   const enviar = (evento: FormEvent) => {
     evento.preventDefault()
+    // Sem data de ida não há busca: o calendário abre para escolher.
+    if (!parametros.ida) {
+      setFaseCalendario('ida')
+      return
+    }
     setAberto(false)
     onBuscar(parametros)
   }
 
-  const classeData = compacto ? 'h-11 px-3.5 text-[15px] vm-num' : 'vm-num'
   const gapCampo = compacto ? 'gap-1.5' : 'gap-2'
 
   const campos = (
@@ -79,46 +81,14 @@ export function BarraBusca({ inicial, onBuscar, buscando = false, variante = 'no
         required
       />
 
-      <div className={cn('flex min-w-0 flex-col', gapCampo)}>
-        <Label htmlFor="busca-ida">Ida</Label>
-        <Input
-          id="busca-ida"
-          type="date"
-          min={hojeISO()}
-          value={parametros.ida}
-          onChange={(e) => atualizar('ida', e.target.value)}
-          className={classeData}
-          required
-        />
-      </div>
-
-      <div className={cn('flex min-w-0 flex-col', gapCampo)}>
-        <Label htmlFor="busca-volta">Volta</Label>
-        <Input
-          id="busca-volta"
-          type={voltaComoData ? 'date' : 'text'}
-          value={parametros.volta}
-          min={parametros.ida}
-          placeholder="Só ida"
-          onFocus={(e) => {
-            if (voltaComoData) return
-            setVoltaComoData(true)
-            const campo = e.currentTarget
-            requestAnimationFrame(() => {
-              try {
-                campo.showPicker()
-              } catch {
-                // Navegadores sem showPicker abrem o seletor no próximo clique.
-              }
-            })
-          }}
-          onBlur={() => {
-            if (!parametros.volta) setVoltaComoData(false)
-          }}
-          onChange={(e) => atualizar('volta', e.target.value)}
-          className={classeData}
-        />
-      </div>
+      <CampoDatas
+        ida={parametros.ida}
+        volta={parametros.volta}
+        onChange={(datas) => setParametros((atual) => ({ ...atual, ...datas }))}
+        fase={faseCalendario}
+        onFase={setFaseCalendario}
+        compacto={compacto}
+      />
 
       {/* No desktop o botão desce até a linha dos campos: um rótulo vazio ocupa o lugar do rótulo dos outros. */}
       <div className={cn('col-span-2 flex flex-col md:col-span-1', gapCampo)}>
