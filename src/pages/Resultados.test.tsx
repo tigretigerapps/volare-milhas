@@ -7,7 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { Oferta } from '@/data/exemplo'
 import type { EstadoBusca } from '@/hooks/useBuscaVoos'
-import { Buscar } from './Buscar'
+import { Resultados } from './Resultados'
 
 const buscar = vi.fn()
 let estado: EstadoBusca
@@ -51,16 +51,19 @@ const pronto = (extra: Partial<Extract<EstadoBusca, { tipo: 'pronto' }>> = {}): 
   pedido,
   ofertas: [oferta()],
   falhas: [],
+  companhias: [{ companhia: 'GOL', status: 'ok' }],
   uso,
   modo: 'real',
   ...extra,
 })
 
-const montar = () =>
+const urlBusca = '/buscar/resultados?origem=GRU&destino=SSA&ida=2030-12-15'
+
+const montar = (url = urlBusca) =>
   render(
-    <MemoryRouter initialEntries={['/buscar']}>
+    <MemoryRouter initialEntries={[url]}>
       <Routes>
-        <Route path="/buscar" element={<Buscar />} />
+        <Route path="/buscar/resultados" element={<Resultados />} />
         <Route path="/entrar" element={<p>tela de entrar</p>} />
       </Routes>
     </MemoryRouter>,
@@ -87,25 +90,26 @@ describe('Buscar sem conta', () => {
     expect(screen.getAllByRole('button', { name: 'Quero essa oferta' })).toHaveLength(4)
   })
 
-  it('buscar leva para a tela de entrar', async () => {
+  it('buscar de novo leva para a tela de entrar', async () => {
     montar()
-    await userEvent.setup().click(screen.getByRole('button', { name: 'Buscar' }))
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Buscar de novo' }))
     expect(screen.getByText('tela de entrar')).toBeInTheDocument()
     expect(buscar).not.toHaveBeenCalled()
   })
 })
 
 describe('Buscar com conta', () => {
-  it('antes da primeira busca não mostra voos nem exemplos', () => {
-    montar()
+  it('sem busca na URL não consulta nem mostra exemplos', () => {
+    montar('/buscar/resultados')
+    expect(buscar).not.toHaveBeenCalled()
     expect(screen.getByText(/toque em Buscar/)).toBeInTheDocument()
     expect(screen.queryByRole('listitem')).not.toBeInTheDocument()
     expect(screen.queryByText(/resultados de exemplo/i)).not.toBeInTheDocument()
   })
 
-  it('envia a busca com as companhias padrão e só ida', async () => {
+  it('consulta a busca da URL com as companhias padrão e só ida', () => {
     montar()
-    await userEvent.setup().click(screen.getByRole('button', { name: 'Buscar' }))
+    expect(buscar).toHaveBeenCalledTimes(1)
     expect(buscar).toHaveBeenCalledWith(
       expect.objectContaining({
         origem: 'GRU',
@@ -120,7 +124,8 @@ describe('Buscar com conta', () => {
     estado = { tipo: 'carregando' }
     montar()
     expect(screen.getByRole('button', { name: 'Buscando…' })).toBeDisabled()
-    expect(screen.getByText(/Buscando ofertas/)).toBeInTheDocument()
+    expect(screen.getByText('Consultando GOL…')).toBeInTheDocument()
+    expect(screen.getByText('Consultando TAP…')).toBeInTheDocument()
   })
 
   it('mostra os resultados com o veredito e o uso do dia', () => {
@@ -156,14 +161,44 @@ describe('Buscar com conta', () => {
   it('sem voos, explica em vez de deixar a tela vazia', () => {
     estado = pronto({ ofertas: [] })
     montar()
-    expect(screen.getByText(/Nenhum voo com preço/)).toBeInTheDocument()
+    expect(screen.getByText(/Nenhuma tarifa encontrada para essa data/)).toBeInTheDocument()
   })
 
-  it('mostra as companhias que não responderam sem esconder as que responderam', () => {
-    estado = pronto({ falhas: ['Não foi possível consultar AZUL agora.'] })
+  it('mostra a companhia que falhou, sem esconder as outras, e deixa tentar de novo', async () => {
+    estado = pronto({
+      companhias: [
+        { companhia: 'GOL', status: 'ok' },
+        { companhia: 'TAP', status: 'erro', mensagem: 'falhou' },
+      ],
+    })
     montar()
-    expect(screen.getByRole('alert')).toHaveTextContent('Não foi possível consultar AZUL agora.')
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'Não conseguimos consultar a TAP agora. As outras companhias não foram afetadas.',
+    )
     expect(screen.getByRole('listitem')).toBeInTheDocument()
+    buscar.mockClear()
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Tentar de novo' }))
+    expect(buscar).toHaveBeenCalledTimes(1)
+  })
+
+  it('avisa a companhia que respondeu sem voos', () => {
+    estado = pronto({
+      ofertas: [oferta({ companhia: 'GOL' })],
+      companhias: [
+        { companhia: 'GOL', status: 'ok' },
+        { companhia: 'AZUL', status: 'ok' },
+      ],
+    })
+    montar()
+    expect(screen.getByText('Azul sem voos nessa data')).toBeInTheDocument()
+    expect(screen.queryByText('GOL sem voos nessa data')).not.toBeInTheDocument()
+  })
+
+  it('título com cidades e data por extenso e a contagem de tarifas', () => {
+    estado = pronto({ ofertas: [oferta({ companhia: 'GOL' }), oferta({ id: 'x2', companhia: 'LATAM' })] })
+    montar()
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('São Paulo para Salvador, 15 de dezembro')
+    expect(screen.getByText(/2 tarifas em 2 companhias, comparadas com o seu milheiro de/)).toBeInTheDocument()
   })
 
   it('mostra o erro da busca (limite do plano) e o uso', () => {
@@ -198,7 +233,7 @@ describe('Buscar com conta', () => {
       screen.getAllByRole('listitem').map((li) => within(li).getByText(/\d\d:\d\d – \d\d:\d\d/).textContent)
     // 12.000 milhas economizam mais que 30.000: a economia põe o voo da tarde primeiro.
     expect(horarios()).toEqual(['18:00 – 20:30', '06:00 – 08:30'])
-    await userEvent.setup().click(screen.getByRole('button', { name: 'horário' }))
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Horário' }))
     expect(horarios()).toEqual(['06:00 – 08:30', '18:00 – 20:30'])
   })
 })

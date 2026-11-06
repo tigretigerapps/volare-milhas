@@ -22,7 +22,7 @@ export type ErroBusca = { codigo: string; mensagem: string; uso?: Uso }
 
 const rotulosSmiles: Record<string, string> = {
   smiles: 'Smiles',
-  'clube smiles': 'Smiles (clube)',
+  'clube smiles': 'Smiles Clube',
   diamante: 'Smiles (diamante)',
 }
 

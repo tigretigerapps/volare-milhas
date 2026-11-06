@@ -7,13 +7,15 @@ import { AlertasProvider } from '@/contexts/AlertasProvider'
 import { AuthProvider } from '@/contexts/AuthProvider'
 import { Admin } from '@/pages/Admin'
 import { Assinar } from '@/pages/Assinar'
-import { Buscar } from '@/pages/Buscar'
+import { AtivarTeste } from '@/pages/AtivarTeste'
 import { Cadastro } from '@/pages/Cadastro'
 import { Conta } from '@/pages/Conta'
 import { Entrar } from '@/pages/Entrar'
 import { EsqueciSenha } from '@/pages/EsqueciSenha'
+import { Home } from '@/pages/Home'
 import { NovaSenha } from '@/pages/NovaSenha'
 import { Privacidade } from '@/pages/Privacidade'
+import { Resultados } from '@/pages/Resultados'
 import { Rotas } from '@/pages/Rotas'
 import { Termos } from '@/pages/Termos'
 
@@ -23,9 +25,15 @@ export default function App() {
       <AlertasProvider>
         <BrowserRouter>
           <Routes>
+            {/* Tela própria, sem barra superior: só o visual aprovado, sem chamar serviço. */}
+            <Route path="assinatura" element={<AtivarTeste />} />
+            {/* Páginas de largura total: montam os próprios containers. */}
+            <Route element={<Layout larguraTotal />}>
+              <Route index element={<Home />} />
+              <Route path="buscar" element={<Home />} />
+              <Route path="buscar/resultados" element={<Resultados />} />
+            </Route>
             <Route element={<Layout />}>
-              <Route index element={<Navigate to="/buscar" replace />} />
-              <Route path="buscar" element={<Buscar />} />
               <Route path="entrar" element={<Entrar />} />
               <Route path="cadastro" element={<Cadastro />} />
               <Route path="termos" element={<Termos />} />
@@ -64,7 +72,7 @@ export default function App() {
                   </RotaAdmin>
                 }
               />
-              <Route path="*" element={<Navigate to="/buscar" replace />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
           </Routes>
         </BrowserRouter>

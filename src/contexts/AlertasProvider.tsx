@@ -38,7 +38,7 @@ export function AlertasProvider({ children }: { children: ReactNode }) {
     const carregar = () => {
       supabase
         .from('alertas_enviados')
-        .select('id, enviado_em, oferta_chave, oferta, rotas_salvas(origem, destino, preco_alvo_milhas, preco_alvo_rs)')
+        .select('id, rota_id, enviado_em, oferta_chave, oferta, rotas_salvas(origem, destino, preco_alvo_milhas, preco_alvo_rs)')
         .order('enviado_em', { ascending: false })
         .limit(50)
         .then(({ data, error }) => {

@@ -146,3 +146,17 @@ export function mensagemErroRota(erro: { message?: string } | null, padrao: stri
   }
   return padrao
 }
+
+const diaMes = new Intl.DateTimeFormat('pt-BR', { day: 'numeric', month: 'long', timeZone: 'UTC' })
+const soDia = (iso: string) => String(Number(iso.slice(8, 10)))
+const porExtenso = (iso: string) => {
+  const [ano, mes, dia] = iso.split('-').map(Number)
+  return diaMes.format(new Date(Date.UTC(ano, mes - 1, dia)))
+}
+
+/** "Ida entre 20 e 27 de janeiro", "Ida entre 28 de janeiro e 3 de fevereiro" ou "Ida em 20 de janeiro". */
+export function periodoDaIda(inicio: string, fim: string): string {
+  if (inicio === fim) return `Ida em ${porExtenso(inicio)}`
+  const mesmoMes = inicio.slice(0, 7) === fim.slice(0, 7)
+  return `Ida entre ${mesmoMes ? soDia(inicio) : porExtenso(inicio)} e ${porExtenso(fim)}`
+}

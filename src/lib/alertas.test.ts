@@ -26,9 +26,23 @@ const linha = (parcial: Partial<LinhaAlerta> = {}): LinhaAlerta => ({
 
 describe('lerOfertaDoAlerta', () => {
   it('lê os campos conhecidos', () => {
-    expect(lerOfertaDoAlerta({ origem: 'gru', destino: 'lis', programa: 'TAP Miles&Go', milhas: 35000, valor_dinheiro_rs: 4100 })).toEqual({
+    expect(
+      lerOfertaDoAlerta({
+        origem: 'gru',
+        destino: 'lis',
+        companhia: 'TAP',
+        numero_voo: 'TP82',
+        data_voo: '2027-01-20',
+        programa: 'TAP Miles&Go',
+        milhas: 35000,
+        valor_dinheiro_rs: 4100,
+      }),
+    ).toEqual({
       origem: 'GRU',
       destino: 'LIS',
+      companhia: 'TAP',
+      voo: 'TP82',
+      dataVoo: '2027-01-20',
       programa: 'TAP Miles&Go',
       milhas: 35000,
       valorReais: 4100,
@@ -40,7 +54,16 @@ describe('lerOfertaDoAlerta', () => {
   })
 
   it('ignora formatos inesperados sem quebrar', () => {
-    const vazio = { origem: null, destino: null, programa: null, milhas: null, valorReais: null }
+    const vazio = {
+      origem: null,
+      destino: null,
+      companhia: null,
+      voo: null,
+      dataVoo: null,
+      programa: null,
+      milhas: null,
+      valorReais: null,
+    }
     expect(lerOfertaDoAlerta(null)).toEqual(vazio)
     expect(lerOfertaDoAlerta('texto')).toEqual(vazio)
     expect(lerOfertaDoAlerta([1, 2])).toEqual(vazio)

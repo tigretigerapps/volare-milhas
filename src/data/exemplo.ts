@@ -35,6 +35,7 @@ export const ofertasExemplo: Oferta[] = [
   {
     id: 'smiles-g31650',
     programa: 'Smiles',
+    companhia: 'GOL',
     voo: 'G31650',
     origem: 'GRU',
     destino: 'SSA',
@@ -48,7 +49,8 @@ export const ofertasExemplo: Oferta[] = [
   },
   {
     id: 'smiles-clube-g31650',
-    programa: 'Smiles (clube)',
+    programa: 'Smiles Clube',
+    companhia: 'GOL',
     voo: 'G31650',
     origem: 'GRU',
     destino: 'SSA',
@@ -63,6 +65,7 @@ export const ofertasExemplo: Oferta[] = [
   {
     id: 'azul-ad4510',
     programa: 'Azul Fidelidade',
+    companhia: 'Azul',
     voo: 'AD4510',
     origem: 'VCP',
     destino: 'SSA',
@@ -73,10 +76,12 @@ export const ofertasExemplo: Oferta[] = [
     dinheiro: 455.07,
     milhas: 12500,
     taxas: 75.17,
+    taxaResgate: 40,
   },
   {
     id: 'latam-la3320',
     programa: 'LATAM Pass',
+    companhia: 'LATAM',
     voo: 'LA3320',
     origem: 'GRU',
     destino: 'SSA',

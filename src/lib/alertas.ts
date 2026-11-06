@@ -4,6 +4,7 @@ import { formatarMilhas, formatarReais } from './formato'
 /** Linha de public.alertas_enviados com a rota (rotas_salvas) embutida. */
 export type LinhaAlerta = {
   id: string
+  rota_id?: string | null
   enviado_em: string
   oferta_chave: string
   oferta: Json
@@ -26,6 +27,12 @@ export type AlertaPrecoAlvo = {
   valorReais: number | null
   metaMilhas: number | null
   metaReais: number | null
+  /** Rota salva que gerou o alerta. */
+  rotaId: string | null
+  companhia: string | null
+  voo: string | null
+  /** "AAAA-MM-DD" */
+  dataVoo: string | null
 }
 
 /** Janela em que um alerta ainda aparece na faixa da busca. */
@@ -34,6 +41,9 @@ export const diasAlertaRecente = 7
 type OfertaDoAlerta = {
   origem: string | null
   destino: string | null
+  companhia: string | null
+  voo: string | null
+  dataVoo: string | null
   programa: string | null
   milhas: number | null
   valorReais: number | null
@@ -51,6 +61,9 @@ export function lerOfertaDoAlerta(oferta: Json): OfertaDoAlerta {
   return {
     origem: texto(o.origem)?.toUpperCase() ?? null,
     destino: texto(o.destino)?.toUpperCase() ?? null,
+    companhia: texto(o.companhia),
+    voo: texto(o.numero_voo),
+    dataVoo: texto(o.data_voo)?.slice(0, 10) ?? null,
     programa: texto(o.programa) ?? texto(o.companhia),
     milhas: positivo(o.milhas),
     valorReais: positivo(o.valor_dinheiro_rs),
@@ -74,6 +87,10 @@ export function montarAlerta(linha: LinhaAlerta): AlertaPrecoAlvo | null {
     valorReais: oferta.valorReais,
     metaMilhas: linha.rotas_salvas?.preco_alvo_milhas ?? null,
     metaReais: linha.rotas_salvas?.preco_alvo_rs ?? null,
+    rotaId: linha.rota_id ?? null,
+    companhia: oferta.companhia,
+    voo: oferta.voo,
+    dataVoo: oferta.dataVoo,
   }
 }
 

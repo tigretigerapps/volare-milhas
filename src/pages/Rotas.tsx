@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button'
 import { useAlertas } from '@/contexts/useAlertas'
 import { usePlano } from '@/hooks/usePlano'
 import { useRotas } from '@/hooks/useRotas'
+import { diasAlertaRecente, type AlertaPrecoAlvo } from '@/lib/alertas'
+import { hojeISO } from '@/lib/datas'
 import { formularioVazio, rotaParaFormulario, type DadosRota } from '@/lib/rotas'
 
 /** null: nenhum formulário aberto; "nova": criando; id: editando aquela rota. */
@@ -13,9 +15,11 @@ type Edicao = null | 'nova' | string
 
 export function Rotas() {
   const { rotas, carregando, erroCarga, criar, atualizar, excluir } = useRotas()
-  const { marcarVistos } = useAlertas()
+  const { alertas, marcarVistos } = useAlertas()
   const { plano, limiteRotas } = usePlano()
   const [edicao, setEdicao] = useState<Edicao>(null)
+  // "Agora" fixo ao abrir a tela: o estado da rota não muda sozinho a cada renderização.
+  const [abertaEm] = useState(() => Date.now())
 
   const formulario = useRef<HTMLDivElement>(null)
 
@@ -32,6 +36,19 @@ export function Rotas() {
   const ativas = rotas.filter((r) => r.ativo).length
   const semVaga = typeof limiteRotas === 'number' && ativas >= limiteRotas
 
+  // Alerta recente de cada rota (o mais novo), de voo que ainda não passou: a rota "chegou ao preço-alvo".
+  const hoje = hojeISO()
+  const limiteRecente = abertaEm - diasAlertaRecente * 86_400_000
+  const alertaPorRota = new Map<string, AlertaPrecoAlvo>()
+  for (const alerta of alertas) {
+    if (!alerta.rotaId || alertaPorRota.has(alerta.rotaId)) continue
+    if (Date.parse(alerta.enviadoEm) < limiteRecente) continue
+    if (alerta.dataVoo && alerta.dataVoo < hoje) continue
+    alertaPorRota.set(alerta.rotaId, alerta)
+  }
+
+  const vagas = typeof limiteRotas === 'number' ? Math.max(limiteRotas - ativas, 0) : null
+
   const rotaEditada = edicao && edicao !== 'nova' ? rotas.find((r) => r.id === edicao) : undefined
 
   const salvar = async (dados: DadosRota) => {
@@ -43,18 +60,22 @@ export function Rotas() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-medium">Minhas rotas</h1>
-          <p className="mt-1 text-sm text-vm-ink-muted">
-            Acompanhamos estas rotas e avisamos quando o preço chegar à sua meta.
+        <div className="max-w-[720px]">
+          <h1 className="text-2xl font-semibold leading-[30px] md:text-heading-l">Minhas rotas</h1>
+          <p className="mt-2 text-vm-ink-muted">
+            {limiteRotas === 0 ? (
+              <span data-testid="uso-rotas">Sua assinatura não está ativa: não é possível criar rotas novas.</span>
+            ) : (
+              <>
+                {typeof limiteRotas === 'number' && (
+                  <span data-testid="uso-rotas" className="vm-num">
+                    {ativas} de {limiteRotas} rotas com alerta{plano ? ` no plano ${plano.nome}` : ''}.{' '}
+                  </span>
+                )}
+                Conferimos todas uma vez por dia e avisamos você quando o preço chega na sua meta.
+              </>
+            )}
           </p>
-          {typeof limiteRotas === 'number' && (
-            <p className="mt-1 text-sm tabular-nums text-vm-ink-muted" data-testid="uso-rotas">
-              {limiteRotas === 0
-                ? 'Sua assinatura não está ativa: não é possível criar rotas novas.'
-                : `${ativas} de ${limiteRotas} rotas com alerta ativas${plano ? ` no plano ${plano.nome}` : ''}.`}
-            </p>
-          )}
         </div>
         {edicao === null && rotas.length > 0 && (
           <Button onClick={() => setEdicao('nova')} disabled={semVaga}>
@@ -79,16 +100,14 @@ export function Rotas() {
       {carregando ? (
         <p className="text-sm text-vm-ink-muted">Carregando suas rotas…</p>
       ) : erroCarga ? (
-        <p role="alert" className="text-sm text-vm-navy-700">
+        <p role="alert" className="text-sm text-vm-burgundy-600">
           {erroCarga}
         </p>
       ) : rotas.length === 0 ? (
         edicao === null && (
-          <div className="flex flex-col items-start gap-3 border-y border-vm-line py-8">
-            <p>Você ainda não monitora nenhuma rota.</p>
-            <p className="text-sm text-vm-ink-muted">
-              Escolha origem, destino, período e um preço-alvo. Quando aparecer uma oferta que bata a meta, você fica
-              sabendo.
+          <div className="flex flex-col items-start gap-4 rounded-vm-md bg-vm-surface-card p-6">
+            <p className="max-w-[560px]">
+              Você ainda não salvou nenhuma rota. Salve uma rota e avisamos quando o preço chegar na sua meta.
             </p>
             <Button onClick={() => setEdicao('nova')} disabled={semVaga}>
               Nova rota
@@ -96,18 +115,33 @@ export function Rotas() {
           </div>
         )
       ) : (
-        <section aria-label="Rotas monitoradas">
-          <ul className="divide-y divide-vm-line border-y border-vm-line">
+        <section aria-label="Rotas monitoradas" className="flex flex-col gap-3 md:block md:overflow-hidden md:rounded-vm-md md:bg-vm-surface-card">
+          <ul className="flex flex-col gap-3 md:block">
             {rotas.map((rota) => (
               <LinhaRota
                 key={rota.id}
                 rota={rota}
+                alerta={alertaPorRota.get(rota.id) ?? null}
                 onEditar={() => setEdicao(rota.id)}
                 onAlternarAtivo={() => atualizar(rota.id, { ativo: !rota.ativo })}
                 onExcluir={() => excluir(rota.id)}
               />
             ))}
           </ul>
+          {limiteRotas !== 0 && limiteRotas !== undefined && (
+            <div className="flex flex-wrap items-center gap-4 rounded-vm-md bg-vm-surface-page p-4 md:rounded-none md:p-6">
+              <p className="min-w-0 flex-1 basis-64 text-sm text-vm-ink-muted">
+                {vagas === 0
+                  ? `Você atingiu o limite de ${limiteRotas} ${limiteRotas === 1 ? 'rota' : 'rotas'} do seu plano.`
+                  : `${vagas === null ? 'Você pode salvar mais rotas.' : `Você ainda pode salvar mais ${vagas} ${vagas === 1 ? 'rota' : 'rotas'}.`} Escolha um período e um preço-alvo em milhas, em reais ou nos dois.`}
+              </p>
+              {vagas !== 0 && edicao === null && (
+                <Button variant="contorno" size="sm" className="h-11 md:h-[38px]" onClick={() => setEdicao('nova')}>
+                  Salvar nova rota
+                </Button>
+              )}
+            </div>
+          )}
         </section>
       )}
     </div>

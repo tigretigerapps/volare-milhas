@@ -40,7 +40,7 @@ const linha = (parcial: Partial<OfertaBanco> = {}): OfertaBanco => ({
 describe('rotuloPrograma', () => {
   it('Smiles e clube aparecem diferentes', () => {
     expect(rotuloPrograma('Smiles', 'smiles', 'GOL')).toBe('Smiles')
-    expect(rotuloPrograma('Smiles', 'clube smiles', 'GOL')).toBe('Smiles (clube)')
+    expect(rotuloPrograma('Smiles', 'clube smiles', 'GOL')).toBe('Smiles Clube')
     expect(rotuloPrograma('Smiles', 'diamante', 'GOL')).toBe('Smiles (diamante)')
   })
 

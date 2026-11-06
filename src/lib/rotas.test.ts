@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  periodoDaIda,
   descreverAlvo,
   descreverCompanhias,
   formatarData,
@@ -144,5 +145,13 @@ describe('mensagemErroRota', () => {
   it('qualquer outro erro usa a mensagem padrão', () => {
     expect(mensagemErroRota({ message: 'outra coisa' }, 'padrão')).toBe('padrão')
     expect(mensagemErroRota(null, 'padrão')).toBe('padrão')
+  })
+})
+
+describe('periodoDaIda', () => {
+  it('junta o mês quando é o mesmo e separa quando muda', () => {
+    expect(periodoDaIda('2027-01-20', '2027-01-27')).toBe('Ida entre 20 e 27 de janeiro')
+    expect(periodoDaIda('2027-01-28', '2027-02-03')).toBe('Ida entre 28 de janeiro e 3 de fevereiro')
+    expect(periodoDaIda('2027-01-20', '2027-01-20')).toBe('Ida em 20 de janeiro')
   })
 })

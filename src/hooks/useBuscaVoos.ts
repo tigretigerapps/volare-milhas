@@ -10,6 +10,9 @@ type RespostaFuncao = {
   uso: Uso
 }
 
+/** Como cada companhia respondeu à busca. */
+export type StatusCompanhia = { companhia: string; status: 'ok' | 'erro'; mensagem?: string }
+
 export type EstadoBusca =
   | { tipo: 'ocioso' }
   | { tipo: 'carregando' }
@@ -20,6 +23,8 @@ export type EstadoBusca =
       ofertas: Oferta[]
       /** Mensagens das companhias que não responderam. */
       falhas: string[]
+      /** Resposta de cada companhia consultada, na ordem do pedido. */
+      companhias: StatusCompanhia[]
       uso: Uso
       /** "mock" = banco fake; os preços não são reais. */
       modo: 'mock' | 'real'
@@ -66,7 +71,8 @@ export function useBuscaVoos() {
       })
     }
 
-    setEstado({ tipo: 'pronto', pedido, ofertas, falhas, uso: data.uso, modo: data.modo })
+    const companhias = data.buscas.map(({ companhia, status, mensagem }) => ({ companhia, status, mensagem }))
+    setEstado({ tipo: 'pronto', pedido, ofertas, falhas, companhias, uso: data.uso, modo: data.modo })
   }, [])
 
   return { estado, buscar }
