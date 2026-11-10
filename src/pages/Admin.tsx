@@ -26,7 +26,7 @@ type Aba = (typeof abas)[number]['id']
 
 function Estado({ carregando, erro, vazio, quantidade }: { carregando: boolean; erro: string | null; vazio: string; quantidade: number }) {
   if (carregando) return <p className="py-6 text-sm text-vm-ink-muted">Carregando…</p>
-  if (erro) return <p role="alert" className="py-6 text-sm text-vm-navy-700">{erro}</p>
+  if (erro) return <p role="alert" className="py-6 text-sm text-vm-burgundy-600">{erro}</p>
   if (quantidade === 0) return <p className="border-y border-vm-line py-6 text-sm text-vm-ink-muted">{vazio}</p>
   return null
 }
@@ -63,9 +63,9 @@ function LinhaLead({
         <p className="text-vm-ink-muted">{lead.profiles?.telefone ?? 'Sem telefone'}</p>
         <p className="mt-1 text-vm-ink-muted">{resumirOferta(lead.oferta)}</p>
         <p className={cn('mt-1', falhou ? 'text-vm-navy-700' : 'text-vm-ink-muted')}>{rotuloCrm(lead)}</p>
-        {falhou && lead.crm_erro && <p className="mt-1 break-words text-xs text-vm-ink-muted">{lead.crm_erro}</p>}
+        {falhou && lead.crm_erro && <p className="mt-1 break-words text-[13px] leading-[18px] text-vm-ink-muted">{lead.crm_erro}</p>}
         {erro && (
-          <p role="alert" className="mt-1 text-vm-navy-700">
+          <p role="alert" className="mt-1 text-vm-burgundy-600">
             {erro}
           </p>
         )}
@@ -79,7 +79,7 @@ function LinhaLead({
           id={`status-${lead.id}`}
           value={lead.status}
           onChange={(e) => void mudar(e.target.value)}
-          className="h-10 w-full rounded-md border border-input bg-vm-surface-card px-3 text-base text-vm-navy-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="h-11 w-full rounded-vm-sm border border-vm-border-control bg-vm-surface-card px-3 text-base text-vm-navy-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           {statusLead.map((s) => (
             <option key={s.valor} value={s.valor}>
@@ -103,7 +103,7 @@ function Leads() {
   return (
     <section aria-label="Leads">
       {falhas > 0 && (
-        <p role="status" className="mb-3 rounded-md border border-vm-line bg-vm-surface-card p-3 text-sm text-vm-navy-700">
+        <p role="status" className="mb-3 rounded-vm-md border border-vm-line bg-vm-surface-card p-3 text-sm text-vm-navy-700">
           {falhas} {falhas === 1 ? 'lead não chegou' : 'leads não chegaram'} ao CRM. Use Reenviar ao CRM em cada um.
         </p>
       )}
@@ -189,8 +189,8 @@ function FormularioPlano({ plano, onSalvar }: { plano: Plano; onSalvar: (plano: 
   }
 
   return (
-    <form onSubmit={salvar} noValidate aria-label={`Plano ${plano.nome}`} className="flex flex-col gap-4 rounded-md border border-vm-line bg-vm-surface-card p-5">
-      <h3 className="text-lg font-medium">{plano.nome}</h3>
+    <form onSubmit={salvar} noValidate aria-label={`Plano ${plano.nome}`} className="flex flex-col gap-4 rounded-vm-md bg-vm-surface-card p-5 md:p-6">
+      <h3 className="text-title">{plano.nome}</h3>
       <div className="grid grid-cols-2 gap-3">
         <div className="flex flex-col gap-1.5">
           <Label htmlFor={`destinos-${plano.plano}`}>Destinos por dia</Label>
@@ -267,7 +267,7 @@ function Alertas() {
         </Button>
       </div>
       {mensagem && (
-        <p role={mensagem.erro ? 'alert' : 'status'} className="rounded-md border border-vm-line bg-vm-surface-card p-3 text-sm text-vm-navy-700">
+        <p role={mensagem.erro ? 'alert' : 'status'} className="rounded-vm-md border border-vm-line bg-vm-surface-card p-3 text-sm text-vm-navy-700">
           {mensagem.texto}
         </p>
       )}
@@ -295,7 +295,7 @@ export function Admin() {
   const [aba, setAba] = useState<Aba>('leads')
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-medium">Painel administrativo</h1>
+      <h1 className="text-2xl font-semibold leading-[30px] md:text-heading-l">Painel administrativo</h1>
 
       <div role="tablist" aria-label="Seções do painel" className="flex gap-1 border-b border-vm-line">
         {abas.map((a) => (
@@ -308,8 +308,8 @@ export function Admin() {
             aria-controls={`painel-${a.id}`}
             onClick={() => setAba(a.id)}
             className={cn(
-              '-mb-px border-b-2 px-4 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-              aba === a.id ? 'border-vm-navy-700 font-medium text-vm-navy-700' : 'border-transparent text-vm-ink-muted hover:text-vm-navy-700',
+              '-mb-px min-h-11 border-b-2 px-4 py-2 text-[15px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+              aba === a.id ? 'border-vm-gold-500 font-semibold text-vm-navy-700' : 'border-transparent text-vm-ink-muted hover:text-vm-navy-700',
             )}
           >
             {a.rotulo}

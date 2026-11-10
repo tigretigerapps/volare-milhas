@@ -138,7 +138,7 @@ export function CampoAeroporto({
               <span className="w-9 shrink-0 font-medium tabular-nums">{aeroporto.codigo}</span>
               <span className="min-w-0">
                 <span className="block text-vm-navy-700">{aeroporto.cidade}</span>
-                <span className="block text-xs text-vm-ink-muted">
+                <span className="block text-[13px] leading-[18px] text-vm-ink-muted">
                   {aeroporto.nome} · {aeroporto.pais}
                 </span>
               </span>

@@ -15,7 +15,7 @@ export function Privacidade() {
       titulo="Política de privacidade"
       introducao={
         <p>
-          Esta política explica como {empresa.nome} (CNPJ {empresa.cnpj}), responsável pela plataforma {empresa.fantasia} Milhas, trata os seus dados
+          Esta política explica como {empresa.nome} (CNPJ {empresa.cnpj}), responsável pela plataforma {empresa.produto}, trata os seus dados
           pessoais, de acordo com a Lei Geral de Proteção de Dados (Lei 13.709/2018). Os{' '}
           <Link className="text-vm-navy-700 underline underline-offset-4 decoration-vm-line hover:decoration-vm-navy-700" to="/termos">
             Termos de uso

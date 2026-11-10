@@ -67,9 +67,9 @@ export function FormularioRota({ titulo, inicial, onSalvar, onCancelar }: Props)
       onSubmit={salvar}
       noValidate
       aria-labelledby="formulario-rota-titulo"
-      className="flex flex-col gap-5 rounded-md border border-vm-line bg-vm-surface-card p-5"
+      className="flex flex-col gap-5 rounded-vm-md bg-vm-surface-card p-5 md:p-6"
     >
-      <h2 id="formulario-rota-titulo" className="text-lg font-medium">
+      <h2 id="formulario-rota-titulo" className="text-title">
         {titulo}
       </h2>
 
@@ -127,7 +127,7 @@ export function FormularioRota({ titulo, inicial, onSalvar, onCancelar }: Props)
 
       <fieldset className="flex flex-col gap-2">
         <legend className="text-sm text-vm-ink-muted">Preço-alvo</legend>
-        <p className="text-xs text-vm-ink-muted">
+        <p className="text-[13px] leading-[18px] text-vm-ink-muted">
           Preencha um ou os dois. Avisamos quando aparecer uma oferta igual ou abaixo.
         </p>
         <div className="grid grid-cols-2 gap-3 md:max-w-md">
@@ -163,7 +163,7 @@ export function FormularioRota({ titulo, inicial, onSalvar, onCancelar }: Props)
 
       <fieldset className="flex flex-col gap-2">
         <legend className="text-sm text-vm-ink-muted">Companhias</legend>
-        <p className="text-xs text-vm-ink-muted">Sem nenhuma marcada, monitoramos todas.</p>
+        <p className="text-[13px] leading-[18px] text-vm-ink-muted">Sem nenhuma marcada, monitoramos todas.</p>
         <div className="flex flex-wrap gap-2">
           {companhiasDisponiveis.map((c) => {
             const marcada = valores.companhias.includes(c.valor)
@@ -171,13 +171,13 @@ export function FormularioRota({ titulo, inicial, onSalvar, onCancelar }: Props)
               <label
                 key={c.valor}
                 className={cn(
-                  'flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 text-sm transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring',
+                  'flex cursor-pointer items-center gap-2 rounded-vm-md border px-3 py-2 text-sm transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring',
                   marcada ? 'border-vm-navy-700 text-vm-navy-700' : 'border-vm-line text-vm-ink-muted hover:border-vm-ink-muted',
                 )}
               >
                 <input
                   type="checkbox"
-                  className="h-4 w-4 accent-vm-navy-700"
+                  className="h-5 w-5 accent-vm-navy-700"
                   checked={marcada}
                   onChange={() => alternarCompanhia(c.valor)}
                 />
@@ -189,7 +189,7 @@ export function FormularioRota({ titulo, inicial, onSalvar, onCancelar }: Props)
       </fieldset>
 
       {erroEnvio && (
-        <p role="alert" className="text-sm text-vm-navy-700">
+        <p role="alert" className="text-sm text-vm-burgundy-600">
           {erroEnvio}
         </p>
       )}

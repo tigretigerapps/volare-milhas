@@ -47,7 +47,7 @@ function FormularioDados({ perfil }: { perfil: Perfil }) {
   }
 
   return (
-    <form onSubmit={salvar} noValidate className="flex flex-col gap-4 rounded-md border border-vm-line bg-vm-surface-card p-5">
+    <form onSubmit={salvar} noValidate className="flex flex-col gap-4 rounded-vm-md bg-vm-surface-card p-5 md:p-6">
       <CampoTexto id="conta-nome" rotulo="Nome" autoComplete="name" value={nome} onChange={(e) => setNome(e.target.value)} />
       <CampoTexto
         id="conta-telefone"
@@ -110,7 +110,7 @@ function AlertasTelegram() {
 
   return (
     <section aria-labelledby="titulo-telegram" className="border-t border-vm-line pt-5">
-      <h2 id="titulo-telegram" className="font-normal">
+      <h2 id="titulo-telegram" className="text-title">
         Alertas no Telegram
       </h2>
       {carregando ? (
@@ -138,7 +138,7 @@ function AlertasTelegram() {
         </>
       )}
       {erro && (
-        <p role="alert" className="mt-2 text-sm text-vm-navy-700">
+        <p role="alert" className="mt-2 text-sm text-vm-burgundy-600">
           {erro}
         </p>
       )}
@@ -172,7 +172,7 @@ function GerenciarAssinatura({ plano }: { plano: string }) {
         <>
           {situacao.renovaEm && <p className="text-vm-ink-muted">Renova em {dataBR(situacao.renovaEm)}.</p>}
           {confirmando ? (
-            <div role="alertdialog" aria-label="Confirmar cancelamento" className="flex flex-col gap-2 rounded-md border border-vm-line bg-vm-surface-card p-3">
+            <div role="alertdialog" aria-label="Confirmar cancelamento" className="flex flex-col gap-2 rounded-vm-md border border-vm-line bg-vm-surface-card p-3">
               <p className="text-vm-navy-700">
                 Cancelar a assinatura?
                 {situacao.renovaEm
@@ -208,7 +208,7 @@ function GerenciarAssinatura({ plano }: { plano: string }) {
         </>
       )}
       {erro && (
-        <p role="alert" className="text-vm-navy-700">
+        <p role="alert" className="text-vm-burgundy-600">
           {erro}
         </p>
       )}
@@ -224,8 +224,8 @@ export function Conta() {
   return (
     <div className="mx-auto flex w-full max-w-lg flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-medium">Conta</h1>
-        <p className="mt-1 text-sm text-vm-ink-muted">{user?.email}</p>
+        <h1 className="text-2xl font-semibold leading-[30px] md:text-heading-l">Conta</h1>
+        <p className="mt-2 text-vm-ink-muted">{user?.email}</p>
       </div>
 
       {perfil ? (
@@ -237,7 +237,7 @@ export function Conta() {
 
       {perfil && (
         <section aria-labelledby="titulo-plano" className="border-t border-vm-line pt-5">
-          <h2 id="titulo-plano" className="font-normal">
+          <h2 id="titulo-plano" className="text-title">
             Plano
           </h2>
           <p className="mt-1 text-sm text-vm-ink-muted">

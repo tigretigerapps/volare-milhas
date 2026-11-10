@@ -18,7 +18,7 @@ export function EsqueciSenha() {
   if (enviadoPara) {
     return (
       <div className="mx-auto w-full max-w-sm">
-        <h1 className="text-2xl font-medium">Confira seu e-mail</h1>
+        <h1 className="text-2xl font-semibold leading-[30px] md:text-heading-l">Confira seu e-mail</h1>
         <p className="mt-2 text-vm-ink-muted">
           Se existir uma conta com <span className="font-normal text-vm-navy-700">{enviadoPara}</span>, enviamos um link para
           criar uma nova senha. Ele vale por pouco tempo.

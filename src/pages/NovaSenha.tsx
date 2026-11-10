@@ -27,7 +27,7 @@ export function NovaSenha() {
   if (!session) {
     return (
       <div className="mx-auto w-full max-w-sm">
-        <h1 className="text-2xl font-medium">Link inválido ou vencido</h1>
+        <h1 className="text-2xl font-semibold leading-[30px] md:text-heading-l">Link inválido ou vencido</h1>
         <p className="mt-2 text-vm-ink-muted">
           Este link para criar uma nova senha não vale mais. Peça um novo e abra-o em seguida.
         </p>

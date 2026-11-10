@@ -185,7 +185,7 @@ export function CampoDatas({ ida, volta, onChange, fase, onFase, compacto = fals
             chevron: 'h-5 w-5 fill-current',
             month_grid: 'border-collapse',
             weekdays: '',
-            weekday: 'h-8 w-11 text-[12px] font-medium uppercase text-vm-ink-muted',
+            weekday: 'h-8 w-11 text-[13px] font-medium capitalize text-vm-ink-muted',
             week: '',
             day: 'p-0 text-center',
             day_button:

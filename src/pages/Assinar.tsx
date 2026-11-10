@@ -28,7 +28,7 @@ export function Assinar() {
   if (status === 'ativo') {
     return (
       <div className="mx-auto w-full max-w-lg">
-        <h1 className="text-2xl font-medium">Sua assinatura está ativa</h1>
+        <h1 className="text-2xl font-semibold leading-[30px] md:text-heading-l">Sua assinatura está ativa</h1>
         <p className="mt-2 text-vm-ink-muted">Para trocar de plano, fale com a equipe da Volare.</p>
         <Button asChild className="mt-6">
           <Link to="/buscar">Buscar voos</Link>
@@ -69,12 +69,12 @@ export function Assinar() {
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-medium">Escolha seu plano</h1>
-        <p className="mt-1 text-sm text-vm-ink-muted">
+        <h1 className="text-2xl font-semibold leading-[30px] md:text-heading-l">Escolha seu plano</h1>
+        <p className="mt-2 text-vm-ink-muted">
           Cobrança mensal, paga por PIX, cartão ou boleto em uma página segura do Asaas. Você escolhe como pagar na hora.
         </p>
         {status && status !== 'pendente' && (
-          <p className="mt-1 text-sm text-vm-ink-muted">Situação atual: {situacaoAssinatura[status] ?? status}.</p>
+          <p className="mt-2 text-vm-ink-muted">Situação atual: {situacaoAssinatura[status] ?? status}.</p>
         )}
       </div>
 
@@ -88,8 +88,8 @@ export function Assinar() {
               <label
                 key={p.plano}
                 className={cn(
-                  'flex cursor-pointer flex-col gap-1 rounded-md border bg-vm-surface-card p-5 focus-within:ring-2 focus-within:ring-ring',
-                  plano === p.plano ? 'border-vm-navy-700' : 'border-vm-line',
+                  'flex cursor-pointer flex-col gap-1 rounded-vm-md border bg-vm-surface-card p-5 focus-within:ring-2 focus-within:ring-ring',
+                  plano === p.plano ? 'border-vm-navy-700 shadow-[0_0_0_1px_var(--vm-navy-700)]' : 'border-vm-line hover:border-vm-border-control',
                 )}
               >
                 <input
@@ -100,8 +100,8 @@ export function Assinar() {
                   onChange={() => setEscolhido(p.plano)}
                   className="sr-only"
                 />
-                <span className="text-lg font-medium">{p.nome}</span>
-                <span className="text-3xl font-light tabular-nums">
+                <span className="text-title">{p.nome}</span>
+                <span className="text-numeral vm-num">
                   {formatarReaisComCentavos(p.preco_mensal)}
                   <span className="text-base text-vm-ink-muted"> por mês</span>
                 </span>
@@ -124,7 +124,7 @@ export function Assinar() {
           />
 
           {erro && (
-            <p role="alert" className="text-sm text-vm-navy-700">
+            <p role="alert" className="text-sm text-vm-burgundy-600">
               {erro}
             </p>
           )}

@@ -29,7 +29,7 @@ export function Cadastro() {
   if (confirmarEmail) {
     return (
       <div className="mx-auto w-full max-w-sm">
-        <h1 className="text-2xl font-medium">Confira seu e-mail</h1>
+        <h1 className="text-2xl font-semibold leading-[30px] md:text-heading-l">Confira seu e-mail</h1>
         <p className="mt-2 text-vm-ink-muted">
           Enviamos um link de confirmação para <span className="font-normal text-vm-navy-700">{confirmarEmail}</span>. Abra o
           link para ativar sua conta e depois entre.
@@ -136,7 +136,7 @@ export function Cadastro() {
           type="checkbox"
           checked={aceitou}
           onChange={(e) => setAceitou(e.target.checked)}
-          className="mt-1 h-4 w-4 shrink-0 accent-vm-navy-700"
+          className="mt-0.5 h-5 w-5 shrink-0 accent-vm-navy-700"
         />
         <span>
           Li e aceito os{' '}
