@@ -11,6 +11,7 @@ import {
   ErroAsaas,
   faturaEmAberto,
   situacaoDasCobrancas,
+  chaveDeOutroAmbiente,
   type ClienteAsaas,
 } from './asaas.ts'
 import { pagamentoConfirmado } from './datas.ts'
@@ -55,6 +56,10 @@ Deno.serve(async (req: Request) => {
   const asaas: ClienteAsaas = {
     chave: chaveAsaas,
     ambiente: Deno.env.get('ASAAS_AMBIENTE') === 'producao' ? 'producao' : 'sandbox',
+  }
+  if (chaveDeOutroAmbiente(asaas.chave, asaas.ambiente)) {
+    console.error(JSON.stringify({ assinar: 'chave_de_outro_ambiente', ambiente: asaas.ambiente }))
+    return erro(503, 'pagamento_indisponivel', 'O pagamento da assinatura está em manutenção. Tente de novo em instantes.')
   }
 
   const db = createClient(Deno.env.get('SUPABASE_URL') ?? '', chaveDeServico(), {

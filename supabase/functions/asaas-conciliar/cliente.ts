@@ -7,6 +7,15 @@ const URL_ASAAS: Record<Ambiente, string> = {
   producao: 'https://api.asaas.com/v3',
 }
 
+/**
+ * As chaves novas do Asaas dizem o ambiente no prefixo: "$aact_prod_" (produção) e "$aact_hmlg_" (sandbox).
+ * Devolve true quando a chave é claramente do outro ambiente (chaves antigas, sem o marcador, passam).
+ */
+export function chaveDeOutroAmbiente(chave: string, ambiente: Ambiente): boolean {
+  if (ambiente === 'producao') return chave.startsWith('$aact_hmlg_')
+  return chave.startsWith('$aact_prod_')
+}
+
 // deno-lint-ignore no-explicit-any
 export type Corpo = Record<string, any>
 

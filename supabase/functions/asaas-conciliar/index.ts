@@ -5,7 +5,7 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 import { createClient } from 'npm:@supabase/supabase-js@2.118.0'
 
-import { consultar, type Ambiente } from './cliente.ts'
+import { chaveDeOutroAmbiente, consultar, type Ambiente } from './cliente.ts'
 import { decidirConciliacao } from './conciliacao.ts'
 
 const responder = (corpo: Record<string, unknown>, status = 200) =>
@@ -36,6 +36,9 @@ Deno.serve(async (req: Request) => {
   const chave = Deno.env.get('ASAAS_API_KEY') ?? ''
   if (!chave) return responder({ erro: 'ASAAS_API_KEY não configurada.' }, 503)
   const ambiente: Ambiente = Deno.env.get('ASAAS_AMBIENTE') === 'producao' ? 'producao' : 'sandbox'
+  if (chaveDeOutroAmbiente(chave, ambiente)) {
+    return responder({ erro: `ASAAS_API_KEY é de outro ambiente: ASAAS_AMBIENTE está como ${ambiente}.` }, 503)
+  }
 
   let simular = false
   try {

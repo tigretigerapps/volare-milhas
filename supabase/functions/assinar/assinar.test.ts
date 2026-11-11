@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { cancelarAssinatura, criarAssinatura, criarCliente, ErroAsaas, faturaEmAberto, situacaoDasCobrancas, URL_ASAAS } from './asaas.ts'
+import { cancelarAssinatura, chaveDeOutroAmbiente, criarAssinatura, criarCliente, ErroAsaas, faturaEmAberto, situacaoDasCobrancas, URL_ASAAS } from './asaas.ts'
 import { pagamentoConfirmado, somarUmMes } from './datas.ts'
 import { validarCpfCnpj } from './documento.ts'
 
@@ -117,5 +117,17 @@ describe('pagamentoConfirmado', () => {
   })
   it('soma um mês respeitando o fim do mês', () => {
     expect(somarUmMes('2026-01-31')).toBe('2026-02-28')
+  })
+})
+
+describe('chaveDeOutroAmbiente', () => {
+  it('acusa chave de produção no sandbox e chave de sandbox em produção', () => {
+    expect(chaveDeOutroAmbiente('$aact_prod_abc', 'sandbox')).toBe(true)
+    expect(chaveDeOutroAmbiente('$aact_hmlg_abc', 'producao')).toBe(true)
+  })
+  it('aceita a chave do ambiente certo e chaves antigas sem marcador', () => {
+    expect(chaveDeOutroAmbiente('$aact_prod_abc', 'producao')).toBe(false)
+    expect(chaveDeOutroAmbiente('$aact_hmlg_abc', 'sandbox')).toBe(false)
+    expect(chaveDeOutroAmbiente('$aact_YTU5abc', 'producao')).toBe(false)
   })
 })
