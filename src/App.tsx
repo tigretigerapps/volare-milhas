@@ -25,8 +25,15 @@ export default function App() {
       <AlertasProvider>
         <BrowserRouter>
           <Routes>
-            {/* Tela própria, sem barra superior: só o visual aprovado, sem chamar serviço. */}
-            <Route path="assinatura" element={<AtivarTeste />} />
+            {/* Tela própria, sem barra superior: teste grátis com checkout do Asaas. */}
+            <Route
+              path="assinatura"
+              element={
+                <RotaProtegida>
+                  <AtivarTeste />
+                </RotaProtegida>
+              }
+            />
             {/* Páginas de largura total: montam os próprios containers. */}
             <Route element={<Layout larguraTotal />}>
               <Route index element={<Home />} />

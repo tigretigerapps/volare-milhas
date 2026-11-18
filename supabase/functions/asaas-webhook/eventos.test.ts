@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { decidirCancelamento, efeitoDoEvento, situacaoFinal, somarUmMes } from './eventos.ts'
+import { decidirCancelamento, efeitoDoEvento, ligacaoDeTeste, situacaoFinal, somarUmMes } from './eventos.ts'
 
 const pagamento = (event: string, extra: Record<string, unknown> = {}) => ({
   id: 'evt_1',
@@ -78,5 +78,40 @@ describe('decidirCancelamento', () => {
       status: 'cancelado',
       acessoAte: '2026-11-05',
     })
+  })
+})
+
+describe('ligacaoDeTeste', () => {
+  const base = {
+    id: 'evt_1',
+    event: 'SUBSCRIPTION_CREATED',
+    subscription: {
+      id: 'sub_1',
+      customer: 'cus_123',
+      billingType: 'CREDIT_CARD',
+      nextDueDate: '2026-11-25',
+      status: 'ACTIVE',
+      externalReference: '0b6f1f7e-1111-4222-8333-944455556666',
+    },
+  }
+  it('liga a assinatura do checkout de teste (cartão, primeira cobrança no futuro)', () => {
+    expect(ligacaoDeTeste(base, '2026-11-18')).toEqual({
+      assinaturaId: 'sub_1',
+      clienteId: 'cus_123',
+      usuarioId: '0b6f1f7e-1111-4222-8333-944455556666',
+      proximaCobranca: '2026-11-25',
+    })
+  })
+  it('ignora a assinatura paga comum, a que vence hoje e outros eventos', () => {
+    expect(ligacaoDeTeste({ ...base, subscription: { ...base.subscription, billingType: 'UNDEFINED' } }, '2026-11-18')).toBeNull()
+    expect(ligacaoDeTeste({ ...base, subscription: { ...base.subscription, nextDueDate: '2026-11-18' } }, '2026-11-18')).toBeNull()
+    expect(ligacaoDeTeste({ ...base, event: 'SUBSCRIPTION_UPDATED' }, '2026-11-18')).toBeNull()
+  })
+  it('não deixa id estranho entrar no filtro', () => {
+    const r = ligacaoDeTeste(
+      { ...base, subscription: { ...base.subscription, customer: 'cus_1,user_id.eq.x', externalReference: 'pedido-9' } },
+      '2026-11-18',
+    )
+    expect(r).toBeNull()
   })
 })

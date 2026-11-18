@@ -6,7 +6,15 @@ export type EventoAsaas = {
   id: string
   event: string
   payment?: { subscription?: string | null; dueDate?: string | null }
-  subscription?: { id?: string | null }
+  subscription?: {
+    id?: string | null
+    customer?: string | null
+    billingType?: string | null
+    nextDueDate?: string | null
+    status?: string | null
+    deleted?: boolean | null
+    externalReference?: string | null
+  }
 }
 
 export type Efeito = {
@@ -79,4 +87,31 @@ export function decidirCancelamento(atual: EstadoAssinatura, hoje: string): Deci
     return { status: 'ativo', acessoAte: atual.proximaCobranca }
   }
   return { status: 'cancelado', acessoAte: null }
+}
+
+export type LigacaoTeste = {
+  assinaturaId: string
+  clienteId: string | null
+  /** Nosso id de usuário, quando o checkout repassa o externalReference para a assinatura. */
+  usuarioId: string | null
+  proximaCobranca: string
+}
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+/**
+ * Assinatura criada pelo checkout do teste grátis: no cartão, ativa e com a primeira cobrança no futuro.
+ * A assinatura paga comum ("UNDEFINED", vence no dia) não entra aqui. `hoje` em "AAAA-MM-DD".
+ */
+export function ligacaoDeTeste(e: EventoAsaas, hoje: string): LigacaoTeste | null {
+  const a = e.subscription
+  if (e.event !== 'SUBSCRIPTION_CREATED' || !a?.id) return null
+  if (a.deleted === true || (a.status && a.status !== 'ACTIVE') || a.billingType !== 'CREDIT_CARD') return null
+  const proxima = typeof a.nextDueDate === 'string' ? a.nextDueDate.slice(0, 10) : ''
+  if (!dataValida(proxima) || proxima <= hoje) return null
+  const usuarioId = typeof a.externalReference === 'string' && UUID.test(a.externalReference) ? a.externalReference : null
+  // Só letras, números e _ (ex.: cus_000123): o id entra num filtro do banco.
+  const clienteId = typeof a.customer === 'string' && /^[A-Za-z0-9_]+$/.test(a.customer) ? a.customer : null
+  if (!usuarioId && !clienteId) return null
+  return { assinaturaId: a.id, clienteId, usuarioId, proximaCobranca: proxima }
 }

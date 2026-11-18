@@ -76,6 +76,15 @@ export function Assinar() {
         {status && status !== 'pendente' && (
           <p className="mt-2 text-vm-ink-muted">Situação atual: {situacaoAssinatura[status] ?? status}.</p>
         )}
+        {(!status || status === 'pendente') && (
+          <p className="mt-2 text-vm-ink-muted">
+            Ainda não testou?{' '}
+            <Link to="/assinatura" className="font-semibold text-vm-navy-700 underline underline-offset-4 decoration-vm-line hover:decoration-vm-navy-700">
+              Comece com 7 dias grátis
+            </Link>
+            , com cartão de crédito.
+          </p>
+        )}
       </div>
 
       {carregando ? (

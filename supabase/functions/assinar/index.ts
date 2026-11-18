@@ -12,8 +12,14 @@ import {
   faturaEmAberto,
   situacaoDasCobrancas,
   chaveDeOutroAmbiente,
+  assinaturasDoCliente,
+  assinaturasPorReferencia,
+  clientesPorDocumento,
+  criarCheckoutTeste,
   type ClienteAsaas,
 } from './asaas.ts'
+import { ICONE_VOLO_BASE64 } from './imagem.ts'
+import { assinaturaDoTeste, checkoutDeTesteAberto, DIAS_TESTE, enderecoDoSite, podeTestar, somarDias } from './teste.ts'
 import { pagamentoConfirmado } from './datas.ts'
 import { soDigitos, validarCpfCnpj } from './documento.ts'
 
@@ -77,12 +83,12 @@ Deno.serve(async (req: Request) => {
   } catch {
     return erro(400, 'pedido_invalido', 'Pedido inválido.')
   }
-  const acao = ['fatura', 'sincronizar', 'cancelar'].includes(String(corpo.acao)) ? String(corpo.acao) : 'assinar'
+  const acao = ['fatura', 'sincronizar', 'cancelar', 'teste'].includes(String(corpo.acao)) ? String(corpo.acao) : 'assinar'
 
   const { data: perfil } = await db.from('profiles').select('nome, telefone').eq('id', usuario.id).maybeSingle()
   const { data: assinatura } = await db
     .from('subscriptions')
-    .select('plano, status, proxima_cobranca, acesso_ate, asaas_customer_id, asaas_subscription_id')
+    .select('plano, status, proxima_cobranca, acesso_ate, data_inicio, asaas_customer_id, asaas_subscription_id')
     .eq('user_id', usuario.id)
     .maybeSingle()
 
@@ -91,6 +97,27 @@ Deno.serve(async (req: Request) => {
     // Só vale para assinatura pendente ou inadimplente (a cancelada não volta por aqui).
     if (acao === 'sincronizar') {
       const situacao = assinatura?.status ?? null
+      // Teste grátis: a pessoa cadastrou o cartão no checkout e voltou antes do aviso do Asaas chegar.
+      if (assinatura && checkoutDeTesteAberto(assinatura)) {
+        const hoje = hojeSaoPaulo()
+        const lista = [
+          ...(await assinaturasDoCliente(asaas, assinatura.asaas_customer_id as string)),
+          ...(await assinaturasPorReferencia(asaas, usuario.id)),
+        ]
+        const teste = assinaturaDoTeste(lista, hoje)
+        if (!teste) return responder({ status: situacao })
+        const { error: erroLigar } = await db
+          .from('subscriptions')
+          .update({ status: 'ativo', asaas_subscription_id: teste.id, data_inicio: hoje, proxima_cobranca: teste.proximaCobranca })
+          .eq('user_id', usuario.id)
+          .is('asaas_subscription_id', null)
+        if (erroLigar) {
+          console.error('falha ao ligar o teste', erroLigar.message)
+          return erro(500, 'erro', 'Não foi possível atualizar sua assinatura agora. Tente de novo em instantes.')
+        }
+        console.log(JSON.stringify({ usuario: usuario.id.slice(0, 8), teste: 'ligado_na_volta' }))
+        return responder({ status: 'ativo' })
+      }
       if (!assinatura?.asaas_subscription_id || (situacao !== 'pendente' && situacao !== 'inadimplente')) {
         return responder({ status: situacao })
       }
@@ -136,6 +163,70 @@ Deno.serve(async (req: Request) => {
 
     const plano = corpo.plano === 'base' || corpo.plano === 'plus' ? corpo.plano : null
     if (!plano) return erro(400, 'pedido_invalido', 'Escolha um plano.')
+
+    // Teste grátis: checkout do Asaas só com cartão; a primeira cobrança vem DIAS_TESTE dias depois.
+    if (acao === 'teste') {
+      const testeUsado = () =>
+        erro(409, 'teste_usado', 'O teste grátis já foi usado nesta conta ou com este CPF. Escolha um plano para continuar.')
+      if (!podeTestar(assinatura ?? null)) return testeUsado()
+
+      const cpf = validarCpfCnpj(corpo.cpf_cnpj)
+      if (!cpf) return erro(400, 'documento_invalido', 'CPF inválido. Confira os números.')
+
+      // Um teste por CPF: se este documento já teve assinatura no Asaas (em qualquer conta), não há teste.
+      for (const clienteId of await clientesPorDocumento(asaas, cpf)) {
+        if ((await assinaturasDoCliente(asaas, clienteId)).length > 0) return testeUsado()
+      }
+
+      const { data: dadosPlano } = await db.from('planos').select('nome, preco_mensal').eq('plano', plano).maybeSingle()
+      if (!dadosPlano) return erro(404, 'plano_inexistente', 'Plano não encontrado.')
+
+      const nome = perfil?.nome?.trim() || usuario.email?.split('@')[0] || 'Cliente Volo Milhas'
+      const celular = perfil?.telefone ? soDigitos(perfil.telefone) : ''
+      const clienteId =
+        assinatura?.asaas_customer_id ??
+        (await criarCliente(asaas, {
+          nome,
+          cpfCnpj: cpf,
+          email: usuario.email ?? null,
+          celular: celular.length >= 10 ? celular : null,
+          userId: usuario.id,
+        }))
+
+      // Checkout aberto, esperando o cartão: sem assinatura no Asaas e sem data de início.
+      const { error: erroGravar } = await db.from('subscriptions').upsert(
+        {
+          user_id: usuario.id,
+          plano,
+          status: 'pendente',
+          asaas_customer_id: clienteId,
+          asaas_subscription_id: null,
+          data_inicio: null,
+          proxima_cobranca: null,
+          acesso_ate: null,
+        },
+        { onConflict: 'user_id' },
+      )
+      if (erroGravar) {
+        console.error('falha ao gravar o teste', erroGravar.message)
+        return erro(500, 'erro', mensagemFalha)
+      }
+
+      const site = enderecoDoSite(req.headers.get('origin'), Deno.env.get('SITE_URL') ?? 'https://volare-milhas.rafael-961.workers.dev')
+      const primeiraCobranca = somarDias(hojeSaoPaulo(), DIAS_TESTE)
+      const checkout = await criarCheckoutTeste(asaas, {
+        clienteId,
+        cliente: { nome, cpfCnpj: cpf, email: usuario.email ?? null },
+        valor: Number(dadosPlano.preco_mensal),
+        nomePlano: dadosPlano.nome,
+        primeiraCobranca,
+        userId: usuario.id,
+        urls: { sucesso: `${site}/conta?teste=ok`, cancelado: `${site}/assinatura`, expirado: `${site}/assinatura` },
+        imagemBase64: ICONE_VOLO_BASE64,
+      })
+      console.log(JSON.stringify({ usuario: usuario.id.slice(0, 8), plano, teste: 'checkout', ambiente: asaas.ambiente }))
+      return responder({ fatura_url: checkout.link })
+    }
     const reativando = assinatura?.status === 'ativo' && Boolean(assinatura.acesso_ate)
     if (assinatura?.status === 'ativo' && !reativando) {
       return erro(409, 'ja_assinante', 'Sua assinatura já está ativa. Para trocar de plano, fale com a equipe da Volare.')

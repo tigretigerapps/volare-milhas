@@ -18,6 +18,17 @@ Nenhuma chave ou token vai neste arquivo. Os segredos ficam só nas Edge Functio
 3. Em até 1 minuto, a conta de teste deve aparecer como assinante ativo, sem abrir a página Conta.
 4. Se não aparecer: em Integrações > Webhooks, confira se a fila está ativa (sem penalização) e se o token é o mesmo do segredo `ASAAS_WEBHOOK_TOKEN`.
 
+## 1b. Testar o teste grátis no sandbox
+
+1. Crie uma conta de teste no site (e-mail novo) e abra `/assinatura`.
+2. Escolha o plano, informe um CPF válido de teste e toque em "Ativar teste grátis".
+3. Na página do Asaas, cadastre um cartão de teste do sandbox (veja "Cartões de teste" na documentação do Asaas).
+4. Ao voltar para Conta, a assinatura deve ficar ativa em alguns segundos, com "Teste grátis até ..." 7 dias depois.
+5. Conferir no log da função `asaas-webhook` a linha `"teste":"ligado"` (ou, em `assinar`, `"teste":"ligado_na_volta"`).
+6. Tentar de novo com outra conta e o mesmo CPF: deve aparecer "O teste grátis já foi usado".
+
+O webhook precisa do evento **SUBSCRIPTION_CREATED** marcado (o diagnóstico acusa se faltar).
+
 ## 2. Virada para produção
 
 Na conta de produção do Asaas (a da Volare):
@@ -50,6 +61,9 @@ Proteção: se a chave e o `ASAAS_AMBIENTE` não combinarem (chave `$aact_prod_`
 - Cancelar essa assinatura em Conta e conferir no painel do Asaas que ela foi cancelada.
 - No dia seguinte, conferir no log da função `asaas-conciliar` o resumo `"corrigidas": 0` e `"erros": 0`.
 
-## Pendente de decisão
+## Teste grátis
 
-- Teste grátis de 7 dias pedindo cartão no início (decidido em 11/11/2026). A tela `/assinatura` existe só no visual; falta ligar ao Asaas: a assinatura nasce com a primeira cobrança 7 dias depois.
+7 dias, com cartão cadastrado no Checkout do Asaas (o cartão não passa pelo Volo); a pessoa escolhe Base ou Plus.
+Vale uma vez por conta e por CPF. A conta fica ativa assim que o Asaas cria a assinatura, ligada por três caminhos:
+o evento SUBSCRIPTION_CREATED no webhook, a conferência ao voltar para Conta e, se nada disso chegar, a pessoa
+ainda pode abrir Conta de novo (a conferência roda a cada visita enquanto estiver pendente).

@@ -132,3 +132,76 @@ export async function situacaoDasCobrancas(
   )
   return { emAberto: pendentes.length + vencidas.length, pagas: [...recebidas, ...confirmadas] }
 }
+
+export type DadosCheckoutTeste = {
+  clienteId: string
+  /** Usado só se o Asaas não aceitar o cliente já criado no checkout. */
+  cliente: { nome: string; cpfCnpj: string; email: string | null }
+  valor: number
+  nomePlano: string
+  primeiraCobranca: string
+  userId: string
+  urls: { sucesso: string; cancelado: string; expirado: string }
+  imagemBase64: string
+}
+
+/**
+ * Checkout do Asaas para o teste grátis: a pessoa cadastra o cartão na página do Asaas (o cartão não passa por
+ * aqui) e a assinatura mensal nasce com a primeira cobrança em `primeiraCobranca`. Devolve o link do checkout.
+ */
+export async function criarCheckoutTeste(c: ClienteAsaas, d: DadosCheckoutTeste): Promise<{ id: string; link: string }> {
+  const base = {
+    billingTypes: ['CREDIT_CARD'],
+    chargeTypes: ['RECURRENT'],
+    minutesToExpire: 60,
+    externalReference: d.userId,
+    callback: { successUrl: d.urls.sucesso, cancelUrl: d.urls.cancelado, expiredUrl: d.urls.expirado },
+    items: [
+      {
+        name: `Volo Milhas ${d.nomePlano}`.slice(0, 30),
+        description: `Assinatura mensal. Teste grátis até ${d.primeiraCobranca.split('-').reverse().join('/')}.`,
+        quantity: 1,
+        value: d.valor,
+        imageBase64: d.imagemBase64,
+      },
+    ],
+    subscription: { cycle: 'MONTHLY', nextDueDate: d.primeiraCobranca },
+  }
+  let r: Corpo
+  try {
+    r = await chamar(c, 'POST', '/checkouts', { ...base, customer: d.clienteId })
+  } catch (e) {
+    // A documentação do Asaas não é clara sobre aceitar um cliente já criado: se recusar, manda os dados dele.
+    if (!(e instanceof ErroAsaas) || e.status !== 400) throw e
+    console.log(JSON.stringify({ checkout: 'sem_customer', motivo: e.descricao }))
+    r = await chamar(c, 'POST', '/checkouts', {
+      ...base,
+      customerData: {
+        name: d.cliente.nome,
+        cpfCnpj: d.cliente.cpfCnpj,
+        ...(d.cliente.email ? { email: d.cliente.email } : {}),
+      },
+    })
+  }
+  const link = typeof r.link === 'string' ? r.link : null
+  if (typeof r.id !== 'string' || !link) throw new ErroAsaas('Asaas não devolveu o link do checkout', 502, null)
+  return { id: r.id, link }
+}
+
+/** Assinaturas do cliente no Asaas (inclusive as removidas, para saber se já houve alguma). */
+export async function assinaturasDoCliente(c: ClienteAsaas, clienteId: string): Promise<Corpo[]> {
+  const r = await chamar(c, 'GET', `/subscriptions?customer=${encodeURIComponent(clienteId)}&includeDeleted=true&limit=50`)
+  return Array.isArray(r.data) ? r.data : []
+}
+
+/** Assinaturas marcadas com o nosso id de usuário (o checkout leva o externalReference). */
+export async function assinaturasPorReferencia(c: ClienteAsaas, userId: string): Promise<Corpo[]> {
+  const r = await chamar(c, 'GET', `/subscriptions?externalReference=${encodeURIComponent(userId)}&limit=50`)
+  return Array.isArray(r.data) ? r.data : []
+}
+
+/** Clientes do Asaas com este CPF ou CNPJ (só dígitos). */
+export async function clientesPorDocumento(c: ClienteAsaas, cpfCnpj: string): Promise<string[]> {
+  const r = await chamar(c, 'GET', `/customers?cpfCnpj=${encodeURIComponent(cpfCnpj)}&limit=20`)
+  return (Array.isArray(r.data) ? r.data : []).map((x: Corpo) => x.id).filter((id: unknown): id is string => typeof id === 'string')
+}

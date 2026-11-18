@@ -5,7 +5,7 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 import { createClient } from 'npm:@supabase/supabase-js@2.118.0'
 
-import { decidirCancelamento, efeitoDoEvento, situacaoFinal, type EventoAsaas } from './eventos.ts'
+import { decidirCancelamento, efeitoDoEvento, ligacaoDeTeste, situacaoFinal, type EventoAsaas } from './eventos.ts'
 
 const hojeSaoPaulo = () =>
   new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date())
@@ -64,6 +64,28 @@ Deno.serve(async (req: Request) => {
   const desfazerRegistro = () => db.from('asaas_eventos').delete().eq('id', evento.id)
 
   try {
+    // Teste grátis: a assinatura nasceu do checkout. Liga à conta que está com o checkout aberto
+    // (pendente, sem assinatura no Asaas), pelo cliente do Asaas ou pelo nosso id de usuário.
+    const hoje = hojeSaoPaulo()
+    const ligacao = ligacaoDeTeste(evento, hoje)
+    if (ligacao) {
+      const filtro = [
+        ligacao.clienteId ? `asaas_customer_id.eq.${ligacao.clienteId}` : null,
+        ligacao.usuarioId ? `user_id.eq.${ligacao.usuarioId}` : null,
+      ].filter(Boolean).join(',')
+      const { data: ligadas, error: erroLigar } = await db
+        .from('subscriptions')
+        .update({ status: 'ativo', asaas_subscription_id: ligacao.assinaturaId, data_inicio: hoje, proxima_cobranca: ligacao.proximaCobranca })
+        .eq('status', 'pendente')
+        .is('asaas_subscription_id', null)
+        .is('data_inicio', null)
+        .or(filtro)
+        .select('id')
+      if (erroLigar) throw erroLigar
+      console.log(JSON.stringify({ evento: evento.event, teste: (ligadas ?? []).length > 0 ? 'ligado' : 'sem_checkout_aberto' }))
+      return responder({ ok: true })
+    }
+
     const efeito = efeitoDoEvento(evento)
     if (!efeito) return responder({ ok: true, ignorado: true })
 

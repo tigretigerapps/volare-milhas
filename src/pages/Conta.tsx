@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { Link } from 'react-router'
+import { Link, useSearchParams } from 'react-router'
 
 import { CampoTexto } from '@/components/CampoTexto'
 import { Button } from '@/components/ui/button'
@@ -13,6 +13,14 @@ import type { Perfil } from '@/contexts/auth-context'
 import { interpretarMilheiro, milheiroParaCampo } from '@/lib/milheiro'
 
 const nomesPlano: Record<string, string> = { base: 'Base', plus: 'Plus' }
+
+/** Ainda no teste grátis: a primeira cobrança é 7 dias depois do início e a data ainda não chegou. */
+function emTeste(a: { data_inicio: string | null; proxima_cobranca: string | null } | null): boolean {
+  if (!a?.data_inicio || !a.proxima_cobranca) return false
+  const [ano, mes, dia] = a.data_inicio.split('-').map(Number)
+  const fimDoTeste = new Date(Date.UTC(ano, mes - 1, dia + 7)).toISOString().slice(0, 10)
+  return a.proxima_cobranca === fimDoTeste
+}
 
 const descricaoStatus: Record<string, string> = {
   pendente: 'aguardando pagamento',
@@ -170,7 +178,13 @@ function GerenciarAssinatura({ plano }: { plano: string }) {
     <div className="mt-3 flex flex-col gap-2 text-sm">
       {situacao.tipo === 'ativa' && (
         <>
-          {situacao.renovaEm && <p className="text-vm-ink-muted">Renova em {dataBR(situacao.renovaEm)}.</p>}
+          {situacao.renovaEm && (
+            <p className="text-vm-ink-muted">
+              {emTeste(assinatura)
+                ? `Teste grátis até ${dataBR(situacao.renovaEm)}. A primeira cobrança é nesse dia; cancele antes se não quiser continuar.`
+                : `Renova em ${dataBR(situacao.renovaEm)}.`}
+            </p>
+          )}
           {confirmando ? (
             <div role="alertdialog" aria-label="Confirmar cancelamento" className="flex flex-col gap-2 rounded-vm-md border border-vm-line bg-vm-surface-card p-3">
               <p className="text-vm-navy-700">
@@ -219,7 +233,10 @@ function GerenciarAssinatura({ plano }: { plano: string }) {
 export function Conta() {
   const { user, perfil, sair } = useAuth()
   const { plano } = usePlano()
-  useSincronizarAssinatura()
+  const [parametros] = useSearchParams()
+  // Volta do checkout do teste grátis: o Asaas leva alguns segundos para criar a assinatura.
+  const voltouDoTeste = parametros.get('teste') === 'ok'
+  useSincronizarAssinatura(voltouDoTeste ? 6 : 1)
 
   return (
     <div className="mx-auto flex w-full max-w-lg flex-col gap-6">
@@ -240,6 +257,16 @@ export function Conta() {
           <h2 id="titulo-plano" className="text-title">
             Plano
           </h2>
+          {voltouDoTeste && perfil.status_assinatura === 'pendente' && (
+            <p role="status" className="mt-1 text-sm text-vm-navy-700">
+              Cartão cadastrado. Estamos confirmando com o Asaas; seu teste grátis começa em alguns segundos.
+            </p>
+          )}
+          {voltouDoTeste && perfil.status_assinatura === 'ativo' && (
+            <p role="status" className="mt-1 text-sm text-vm-navy-700">
+              Teste grátis ativado. Bom proveito!
+            </p>
+          )}
           <p className="mt-1 text-sm text-vm-ink-muted">
             {perfil.plano
               ? `${nomesPlano[perfil.plano] ?? perfil.plano}, ${descricaoStatus[perfil.status_assinatura] ?? perfil.status_assinatura}.`

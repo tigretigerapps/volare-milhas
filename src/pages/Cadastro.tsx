@@ -63,7 +63,7 @@ export function Cadastro() {
       options: {
         // O trigger do banco copia nome e telefone daqui para public.profiles.
         data: { nome: nome.trim(), telefone: telefone.trim() || null, termos_aceitos_em: new Date().toISOString() },
-        emailRedirectTo: `${window.location.origin}/conta`,
+        emailRedirectTo: `${window.location.origin}/assinatura`,
       },
     })
     setEnviando(false)
@@ -72,7 +72,7 @@ export function Cadastro() {
       return
     }
     if (data.session) {
-      navigate((location.state as { de?: string } | null)?.de ?? '/conta', { replace: true })
+      navigate((location.state as { de?: string } | null)?.de ?? '/assinatura', { replace: true })
     } else {
       setConfirmarEmail(email.trim())
     }
